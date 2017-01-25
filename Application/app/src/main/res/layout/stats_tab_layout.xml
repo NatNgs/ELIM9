@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HorizontalScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TableLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:text="@string/avgTimeLabelText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/avgTimeLabel"
+                android:textAlignment="center" />
+
+            <TextView
+                android:text="@string/totalTimeLabelText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/totalTimeLabel"
+                android:textAlignment="center" />
+
+            <TextView
+                android:text="@string/totalChargeLabelText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/totalChargeLabel"
+                android:textAlignment="center" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+            <TextView
+                android:text="@string/chargingLabelText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/chargingLabel" />
+
+            <TextView
+                android:text="@string/unknownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/chargingAvgTime"
+                android:textAlignment="center" />
+
+            <TextView
+                android:text="@string/unknownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/chargingTotalTime"
+                android:textAlignment="center" />
+
+            <TextView
+                android:text="@string/unknownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/chargingTotalValue"
+                android:textAlignment="center" />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+            <TextView
+                android:text="@string/activeLabelText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/activeLabel" />
+
+            <TextView
+                android:text="@string/unknownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/activeAvgTime"
+                android:textAlignment="center" />
+
+            <TextView
+                android:text="@string/unknownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/activeTotalTime"
+                android:textAlignment="center" />
+
+            <TextView
+                android:text="@string/unknownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/activeTotalValue"
+                android:textAlignment="center" />
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+            <TextView
+                android:text="@string/inactiveLabelText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/inactiveLabel" />
+
+            <TextView
+                android:text="@string/unknownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/inactiveAvgTime"
+                android:textAlignment="center" />
+
+            <TextView
+                android:text="@string/unknownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/inactiveTotalTime"
+                android:textAlignment="center" />
+
+            <TextView
+                android:text="@string/unknownText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/inactiveTotalValue"
+                android:textAlignment="center" />
+        </TableRow>
+
+    </TableLayout>
+</HorizontalScrollView>

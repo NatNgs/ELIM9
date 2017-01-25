@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">ELIM9</string>
+    <string name="testLabelText">Test</string>
+    <string name="noneText">- none -</string>
+    <string name="labelLanguageText">Language</string>
+    <string name="labelKeyboardTypeText">Detected keyboard</string>
+    <string name="monitoringActivatedText">Monitoring activated</string>
+    <string name="statsLabelText">Stats</string>
+    <string name="wordCountLabelText">Words count</string>
+    <string name="meanTimeLabelText">Mean word time</string>
+    <string name="phoneModelLabel">Phone model</string>
+    <string name="avgTimeLabelText">AVG 100% Time</string>
+    <string name="totalTimeLabelText">Total time</string>
+    <string name="totalChargeLabelText">Total (dis-)charge</string>
+    <string name="unknownText">- unknown -</string>
+    <string name="inactiveLabelText">Inactive</string>
+    <string name="activeLabelText">Active</string>
+    <string name="chargingLabelText">Charging</string>
+    <string name="otherPhoneStatsLabel">All same models phones</string>
+    <string name="MyPhoneStatsLabel">My Phone</string>
+    <string name="synchronizeButtonText">Synchronize</string>
+    <string name="title_activity_tabbed">TabbedActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+</resources>
