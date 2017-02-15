@@ -138,6 +138,7 @@ public class MonitoringService extends IntentService {
 
     private void pushData() {
         // TODO
+        Log.d("PushedData", "Data:"+isBatteryCharging+"/"+isScreenActive);
     }
 
     public static File getDataFile() {
