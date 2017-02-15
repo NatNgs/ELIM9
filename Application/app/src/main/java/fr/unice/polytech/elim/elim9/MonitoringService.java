@@ -160,11 +160,15 @@ public class MonitoringService extends IntentService {
 
 
     private void pushData() {
+
         // Get a reference to our posts
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         final String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        
+
+        // TODO
+        Log.d("PushedData", "Data:"+isBatteryCharging+"/"+isScreenActive);
+
     }
 
     public static File getDataFile() {
