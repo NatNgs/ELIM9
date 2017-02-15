@@ -24,8 +24,9 @@
 
         <service
             android:name=".MonitoringService"
-            android:enabled="false"
-            android:exported="false"></service>
+            android:enabled="true"
+            android:exported="true" />
+
     </application>
 
 </manifest>
