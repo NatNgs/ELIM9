@@ -3,8 +3,10 @@ package fr.unice.polytech.elim.elim9;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,6 +33,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickDisconnect(View view) {
-        // TODO
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        startActivity(loginIntent);
+        finish();
+    }
+
+    /**
+     *
+     * @param value Between 0 and 1 included, else progress will be indeterminate
+     */
+    public void changeProgressBarValue(double value) {
+        ProgressBar progressBar = (ProgressBar)findViewById(R.id.main_prediction_progress);
+        final int PRECISION = progressBar.getWidth();
+
+        if(value < 0 || value > 1 || PRECISION == 0) {
+            progressBar.setIndeterminate(true);
+
+            if(PRECISION==0) {
+                Log.e("MainActivity", "Progressbar width = 0 !!");
+            }
+        } else {
+            progressBar.setIndeterminate(false);
+            progressBar.setProgress((int) ((1 - value) * PRECISION)); // because progressbar is inverted
+            progressBar.setMax(PRECISION);
+        }
     }
 }

@@ -1,11 +1,14 @@
 package fr.unice.polytech.elim.elim9;
 
 import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
+import android.os.Build;
+import android.os.PowerManager;
 import android.util.Log;
 
 import java.io.File;
@@ -14,12 +17,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MonitoringService extends IntentService {
+    private static final String phoneModel = android.os.Build.MODEL;
     private static final String DATA_FILENAME = "ELIM9MonitoredData";
     protected static final String PARAM_ON_OFF = "activation";
-    private boolean isActive = false;
+
     private static File dataFile = null;
-    private final Set<EventReceiver> receivers = new HashSet<>();
-    private final String phoneModel = android.os.Build.MODEL;
+
+    private final Set<BroadcastReceiver> receivers = new HashSet<>();
+    private boolean isMonitoring = false;
+    private boolean isBatteryCharging = isBatteryCharging();
+    private boolean isScreenActive = isScreenActive();
 
     final private AsyncTask<Void,Void,Void> at = new AsyncTask<Void,Void,Void>() {
         @Override
@@ -32,46 +39,33 @@ public class MonitoringService extends IntentService {
                 Log.d("MonitoringService", "Ancient DataFile deleted");
             }
 
-            // Battery is charging or not ?
-            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-            final Intent batteryStatus = getApplicationContext().registerReceiver(null, ifilter);
-            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-            boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                    status == BatteryManager.BATTERY_STATUS_FULL;
-            BatteryData dt = new BatteryData(batteryStatus, isCharging, true);
-            Util.storeDatatable(dt);
-
-            // Setting Current status
-            EventReceiver.setCharging(isCharging);
-            EventReceiver.setScreenOn(true);
-
             // Preparing listeners
-            EventReceiver powerConnectedReceiver = new EventReceiver() {
+            BroadcastReceiver powerConnectedReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    setCharging(true);
-                    super.onReceive(context, intent);
+                    isBatteryCharging = true;
+                    pushData();
                 }
             };
-            EventReceiver powerDisconnectedReceiver = new EventReceiver() {
+            BroadcastReceiver powerDisconnectedReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    setCharging(false);
-                    super.onReceive(context, intent);
+                    isBatteryCharging = false;
+                    pushData();
                 }
             };
-            EventReceiver screenUnlocked = new EventReceiver() {
+            BroadcastReceiver screenUnlocked = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    setScreenOn(true);
-                    super.onReceive(context, intent);
+                    isScreenActive = true;
+                    pushData();
                 }
             };
-            EventReceiver screenLocked = new EventReceiver() {
+            BroadcastReceiver screenLocked = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    setScreenOn(false);
-                    super.onReceive(context, intent);
+                    isScreenActive = false;
+                    pushData();
                 }
             };
 
@@ -106,23 +100,44 @@ public class MonitoringService extends IntentService {
     }
 
     private void toggleOn() {
-        if(!isActive)
+        if(!isMonitoring)
             at.execute();
         else
             Log.e("MonitoringService", "Already Active");
     }
 
     private void toggleOff() {
-        if(isActive) {
+        if(isMonitoring) {
             Log.d("MonitoringService", "Shutting down listeners...");
-            for (EventReceiver er : receivers)
-                unregisterReceiver(er);
+            for (BroadcastReceiver br : receivers)
+                unregisterReceiver(br);
             receivers.clear();
-            isActive = false;
+            isMonitoring = false;
             Log.d("MonitoringService", "Inactive !");
         } else {
             Log.e("MonitoringService", "Already Inactive");
         }
+    }
+
+    public boolean isBatteryCharging() {
+        // Battery is charging or not ?
+        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = getApplicationContext().registerReceiver(null, ifilter);
+        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        return status == BatteryManager.BATTERY_STATUS_CHARGING
+                || status == BatteryManager.BATTERY_STATUS_FULL;
+    }
+    public boolean isScreenActive() {
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            return powerManager.isInteractive();
+        }
+        return powerManager.isScreenOn();
+    }
+
+
+    private void pushData() {
+        // TODO
     }
 
     public static File getDataFile() {
