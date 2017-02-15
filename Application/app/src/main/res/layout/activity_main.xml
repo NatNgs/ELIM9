@@ -8,77 +8,104 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="fr.unice.polytech.elim9.Activity1">
-
-    <Switch
-        android:text="@string/monitoringActivatedText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/switchOnOff"
-        android:checked="false"
-        android:onClick="monitoringToggled"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+    tools:context="fr.unice.polytech.elim.elim9.MainActivity">
 
     <TextView
-        android:text="@string/phoneModelLabel"
+        android:id="@+id/main_id_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/phoneModelLabel"
-        android:layout_below="@+id/switchOnOff"
-        android:layout_alignParentStart="true"
-        android:textColor="@color/colorSecondary" />
-
+        android:text="@string/my_id_label"/>
     <TextView
-        android:text="@string/unknownText"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/phoneModelLabel"
-        android:layout_toEndOf="@+id/phoneModelLabel"
-        android:id="@+id/phoneModelValue"
-        android:textAlignment="viewEnd" />
-
-    <TextView
-        android:text="@string/MyPhoneStatsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/phoneModelLabel"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="30dp"
-        android:id="@+id/myPhoneLabel"
-        android:textColor="@color/colorSecondary" />
-
-    <include layout="@layout/stats_tab_layout"
-        android:id="@+id/myPhoneStats"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/myPhoneLabel"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:text="@string/otherPhoneStatsLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:id="@+id/otherPhoneStatsLabel"
-        android:layout_below="@+id/myPhoneStats"
-        android:layout_alignParentStart="true"
-        android:textColor="@color/colorSecondary" />
-
-    <include layout="@layout/stats_tab_layout"
-        android:id="@+id/otherPhoneStats"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/otherPhoneStatsLabel"
-        android:layout_alignParentStart="true" />
-
+        android:text="@string/disconnected_status"
+        android:layout_toEndOf="@id/main_id_label"
+        android:layout_alignParentEnd="true"
+        android:textAlignment="textEnd" />
     <Button
-        android:text="@string/synchronizeButtonText"
+        android:id="@+id/main_disconnect_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/synchronizeButton"
-        android:onClick="synchronizeData" />
+        android:text="@string/disconnect"
+        android:layout_below="@id/main_id_label"
+        android:onClick="onClickDisconnect"/>
+
+    <RelativeLayout
+        android:id="@+id/monitoring_activation_zone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/main_disconnect_button"
+        android:paddingTop="50dp">
+
+        <TextView
+            android:id="@+id/main_monitoring_activation_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/monitoring_activation_label"
+            android:layout_alignParentStart="true"
+            android:textColor="@android:color/black" />
+
+        <Switch
+            android:id="@+id/main_monitoring_activation_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignEnd="@+id/main_monitoring_activation_label" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/monitoring_activation_zone">
+
+        <TextView
+            android:id="@+id/main_prediction_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/prediction_label"
+            android:layout_alignParentStart="true"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/main_prediction_bad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/prediction_bad_label"
+            android:layout_toEndOf="@id/main_prediction_label"/>
+
+        <ProgressBar
+            android:id="@+id/main_prediction_progress"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/main_prediction_bad"
+            android:layout_toStartOf="@+id/main_prediction_good"
+            android:progressTint="@android:color/holo_green_dark"
+            android:progressBackgroundTint="@android:color/holo_red_light"
+            android:indeterminateTint="@android:color/holo_blue_dark"
+            android:max="100"
+            android:progress="50"
+            android:indeterminate="true"
+            android:rotation="180" />
+
+        <TextView
+            android:id="@id/main_prediction_good"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/prediction_good_label"
+            android:layout_alignParentEnd="true"/>
+
+        <TextView
+            android:id="@+id/main_prediction_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/waiting_for_more_monitored_data"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@id/main_prediction_label"
+            android:layout_below="@id/main_prediction_progress"/>
+    </RelativeLayout>
+
 
 </RelativeLayout>

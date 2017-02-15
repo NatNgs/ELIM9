@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "142352868384",
+    "firebase_url": "https://elim9-76267.firebaseio.com",
+    "project_id": "elim9-76267",
+    "storage_bucket": "elim9-76267.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142352868384:android:f209cdf81abcb37a",
+        "android_client_info": {
+          "package_name": "fr.unice.polytech.elim.elim9"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "142352868384-5ho8iojkqhv1f7h7ukt46qdk1pr88cu5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAsjLc84l1J5RlTxY7wkk3JvMlqaN8MqQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
