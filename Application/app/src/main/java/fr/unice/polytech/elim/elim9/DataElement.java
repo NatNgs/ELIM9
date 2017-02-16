@@ -5,6 +5,12 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -200,6 +206,42 @@ public class DataElement {
         }
 
         return null;
+    }
+
+    private final static String SAVE_FILE_NAME = "elim9.save";
+    public static void save() {
+        File f = new File(SAVE_FILE_NAME);
+        try {
+            if ((f.exists() && !f.delete()) || f.createNewFile())
+                throw new IOException("Cannot Delete file "+f.getCanonicalPath());
+
+            FileOutputStream fos = new FileOutputStream(f);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(DataElement.instance.dataArrays);
+            oos.close();
+            fos.close();
+        } catch (IOException e) {
+            Log.e("DataElement", "Save:"+e.getMessage(), e);
+        }
+    }
+
+    public static void load() {
+        File f = new File(SAVE_FILE_NAME);
+        try {
+            FileInputStream fis = new FileInputStream(f);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            Map<DataKind, List<PairDateValue>> map = (Map<DataKind, List<PairDateValue>>) ois.readObject();
+
+            if(map != null) {
+                instance.dataArrays.clear();
+                instance.dataArrays.putAll(map);
+            }
+
+            ois.close();
+            fis.close();
+        } catch (IOException | ClassNotFoundException e) {
+            Log.e("DataElement", "Load:"+e.getMessage(), e);
+        }
     }
 
 

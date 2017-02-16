@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MonitoringService extends IntentService {
-    private static final String phoneModel = android.os.Build.MODEL;
     private static final String DATA_FILENAME = "ELIM9MonitoredData";
     protected static final String PARAM_ON_OFF = "activation";
 
@@ -53,12 +52,11 @@ public class MonitoringService extends IntentService {
 
     private void toggleOn() {
         if(!isMonitoring) {
-            startMinotoring();
+            Log.d("MonitoringService", "Loading DataElement...");
+            DataElement.load();
+
             Log.d("MonitoringService", "StartMonitoring...");
-            for (BroadcastReceiver br : receivers) {
-                Log.d("MonitoringService", "Listen on :" + br.toString());
-                unregisterReceiver(br);
-            }
+            startMonitoring();
             isMonitoring = true;
         }
         else
@@ -69,9 +67,12 @@ public class MonitoringService extends IntentService {
         if(isMonitoring) {
             Log.d("MonitoringService", "Shutting down listeners...");
             for (BroadcastReceiver br : receivers) {
-                Log.d("MonitoringService", "Shutting down listener :" + br.toString());
                 unregisterReceiver(br);
             }
+
+            Log.d("MonitoringService", "Saving DataElement to File...");
+            DataElement.save();
+
             receivers.clear();
             isMonitoring = false;
             Log.d("MonitoringService", "Inactive !");
@@ -80,7 +81,7 @@ public class MonitoringService extends IntentService {
         }
     }
 
-    public void startMinotoring(){
+    public void startMonitoring(){
         Log.d("MonitoringService", "Activating...");
 
         dataFile = new File(getCacheDir(), DATA_FILENAME);
@@ -149,6 +150,7 @@ public class MonitoringService extends IntentService {
     }
 
     public boolean isScreenActive() {
+        // TODO
         /*PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             return powerManager.isInteractive();
@@ -183,11 +185,15 @@ public class MonitoringService extends IntentService {
             DataElement.instance.putDischargeInactive(time,level,levelScale);
         }
 
-        // TODO remove from here if want disable automatically push
-        String jsonStr = DataElement.instance.toJsonString();
+        // TODO remove from here for disable automatically push
         DatabaseReference ref = database.getReference("users/"+id);
-        ref.setValue(new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Calendar.getInstance()),
-                jsonStr);
+        ref.setValue(
+                new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Calendar.getInstance()),
+                DataElement.instance.toJsonString());
+
+        ref.setValue(
+                "buildModel",
+                android.os.Build.MODEL);
     }
 
     public static File getDataFile() {
