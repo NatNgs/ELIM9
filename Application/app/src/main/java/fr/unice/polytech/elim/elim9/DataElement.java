@@ -18,11 +18,19 @@ import static fr.unice.polytech.elim.elim9.DataElement.DataKind.*;
  */
 
 public class DataElement {
-    private static final long MAX_DIFF_TIME = 1000L*60*60*24*7;
-    public static final DataElement instance = new DataElement();
+    private static final long MAX_DIFF_TIME = 1000L*60*60*24*7; // 7 days in ms
+    public static DataElement instance = null;
+    private static final double MIN_PCT = 0.05;
 
     private final Map<DataKind, List<PairDateValue>> dataArrays = new HashMap<>();
     private final Map<String, Double> lastValues = new HashMap<>();
+
+    public static DataElement getInstance(){
+        if(instance == null){
+            instance = new DataElement();
+        }
+        return instance;
+    }
 
     private DataElement() {
         for(DataKind dk : DataKind.values())
@@ -42,12 +50,16 @@ public class DataElement {
      */
     private double getDischargeActiveAvgTime() {
         double time = count(dischActTime);
-        double pct = count(dischActPct)*100;
+        double pct = count(dischActPct);
 
-        if(time == 0 || pct == 0) {
+        Log.e("ELIM9DataElement","dischActTime:"+dataArrays.get(dischActTime));
+        Log.e("ELIM9DataElement","dischActPct:"+dataArrays.get(dischActPct));
+        Log.e("ELIM9DataElement","time="+time+", pct="+pct+", will return "+((time/10)/pct));
+
+        if(time == 0 || pct <= MIN_PCT) {
             return 0;
         }
-        return time/pct;
+        return (time)/pct; // ((time/1000 > seconds)/ %)*100 > s/100%
     }
 
     /**
@@ -56,12 +68,16 @@ public class DataElement {
      */
     private double getDischargeInactiveAvgTime() {
         double time = count(dischInactTime);
-        double pct = count(dischInactPct)*100;
+        double pct = count(dischInactPct);
 
-        if(time == 0 || pct == 0) {
+        Log.e("ELIM9DataElement","dischInactTime:"+dataArrays.get(dischInactTime));
+        Log.e("ELIM9DataElement","dischInactPct:"+dataArrays.get(dischInactPct));
+        Log.e("ELIM9DataElement","time="+time+", pct="+pct+", will return "+((time/10)/pct));
+
+        if(time == 0 || pct <= MIN_PCT) {
             return 0;
         }
-        return time/pct;
+        return (time)/pct; // ((time > seconds)/ %)*100 > s/100%
     }
 
     /**
@@ -70,25 +86,34 @@ public class DataElement {
      */
     private double getChargeActiveAvgTime() {
         double time = count(chActTime);
-        double pct = count(chActPct)*100;
+        double pct = count(chActPct);
 
-        if(time == 0 || pct == 0) {
+        Log.e("ELIM9DataElement","chActTime:"+dataArrays.get(chActTime));
+        Log.e("ELIM9DataElement","chActPct:"+dataArrays.get(chActPct));
+        Log.e("ELIM9DataElement","time="+time+", pct="+pct+", will return "+((time/10)/pct));
+
+
+        if(time == 0 || pct <= MIN_PCT) {
             return 0;
         }
-        return time/pct;
+        return (time)/pct; // ((time > seconds)/ %)*100 > s/100%
     }
     /**
      *
      * @return s/100% value
      */
-    private double getChargeInactiveAvgTime() {
+    private double getChargeInactiveAvgTime () {
         double time = count(chInactTime);
-        double pct = count(chInactPct)*100;
+        double pct = count(chInactPct);
 
-        if(time == 0 || pct == 0) {
+        Log.e("ELIM9DataElement","chInactTime:"+dataArrays.get(chInactTime));
+        Log.e("ELIM9DataElement","chInactPct:"+dataArrays.get(chInactPct));
+        Log.e("ELIM9DataElement","time="+time+", pct="+pct+", will return "+((time/10)/pct));
+
+        if(time == 0 || pct <= MIN_PCT) {
             return 0;
         }
-        return time/pct;
+        return (time)/pct; // ((time > seconds)/ %)*100 > s/100%
     }
     /**
      *
@@ -118,15 +143,21 @@ public class DataElement {
     public void putChargeInactive(long time, int pct, int pctMax) {
         putTimeChargeData(time, (double)pct/(double)pctMax, dataArrays.get(chInactTime), dataArrays.get(chInactPct));
     }
+    public void putRam(long time, long ram) {
+        List<PairDateValue> ramArray = dataArrays.get(ramUsage);
+        ramArray.add(new PairDateValue(time, ram));
+        removeOld(ramArray, time);
+    }
 
     private void putTimeChargeData(long time, double charge, List<PairDateValue> timeArray, List<PairDateValue> pctArray) {
-        if ((lastValues.containsKey("time") && lastValues.containsKey("chargeLevel") && lastValues.containsKey("chargeLevelScale"))) {
+        if ((lastValues.containsKey("time") && lastValues.containsKey("chargeLevel"))) {
             double lastTime = lastValues.get("time");
             double lastCharge = lastValues.get("chargeLevel");
 
-
+            Log.e("ELIM9DataElement", "Charge="+charge+", lastChargeWas="+lastCharge);
             if(charge != lastCharge) {
                 pctArray.add(new PairDateValue(time,charge - lastCharge));
+                Log.e("ELIM9DataElement", "Added pairDateValue:"+time+", "+(charge-lastCharge));
             }
             if(time != lastTime) {
                 timeArray.add(new PairDateValue(time, time - lastTime));
@@ -136,25 +167,39 @@ public class DataElement {
             removeOld(pctArray, time);
         }
 
-        lastValues.put("time", time/1000.);
+        lastValues.put("time", (double)time);
         lastValues.put("chargeLevel", charge);
     }
 
     private void removeOld(List<PairDateValue> array, long date) {
         while(array.size() > 0 && array.get(0).date + MAX_DIFF_TIME < date) {
+            Log.e("ELIM9DataElement", "Removed Old:"+array.get(0).date+" + "+MAX_DIFF_TIME+" = "+(array.get(0).date+MAX_DIFF_TIME)+" < "+date);
             array.remove(0);
         }
     }
 
-
     public Map<String, Object> toMap() {
         Map<String,Object> ret = new HashMap<>();
 
-        ret.put("chargeActive", getChargeActiveAvgTime());
-        ret.put("chargeInactive", getChargeInactiveAvgTime());
-        ret.put("dischargeActive", getDischargeActiveAvgTime());
-        ret.put("dischargeInactive", getDischargeInactiveAvgTime());
-        ret.put("ramUsage", getAvgRamUsage());
+        long value = (long)getChargeActiveAvgTime();
+        if(value != 0)
+            ret.put("chargeActive", value);
+
+        value = (long)getChargeInactiveAvgTime();
+        if(value != 0)
+            ret.put("chargeInactive", value);
+
+        value = (long)getDischargeActiveAvgTime();
+        if(value != 0)
+            ret.put("dischargeActive", value);
+
+        value = (long)getDischargeInactiveAvgTime();
+        if(value != 0)
+            ret.put("dischargeInactive", value);
+
+        value = (long)getAvgRamUsage();
+        if(value != 0)
+            ret.put("ramUsage", value);
 
         return ret;
     }
@@ -169,11 +214,11 @@ public class DataElement {
             FileOutputStream fos = new FileOutputStream(f);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(json);
-            Log.e("DataElement", "Saved: "+json);
+            Log.e("ELIM9DataElement", "Saved: "+json);
             oos.close();
             fos.close();
         } catch (IOException e) {
-            Log.e("DataElement", "Save:"+e.getMessage(), e);
+            Log.e("ELIM9DataElement", "Save:"+e.getMessage(), e);
         }
     }
 
@@ -183,7 +228,7 @@ public class DataElement {
             FileInputStream fis = new FileInputStream(f);
             ObjectInputStream ois = new ObjectInputStream(fis);
             String json = (String) ois.readObject();
-            Log.e("DataElement", "Loaded: "+json);
+            Log.e("ELIM9DataElement", "Loaded: "+json);
 
             Map<DataKind, List<PairDateValue>> map = fromSaveStr(json);
             if (map != null) {
@@ -194,9 +239,10 @@ public class DataElement {
             ois.close();
             fis.close();
         } catch (Exception e) {
-            Log.d("DataElement", "Cannot load: "+e.toString(), e);
+            Log.d("ELIM9DataElement", "Cannot load: "+e.toString(), e);
         }
     }
+
 
 
     enum DataKind implements Serializable {
@@ -212,12 +258,17 @@ public class DataElement {
     }
 
     public static class PairDateValue {
-        private long date;
+        private long date; // miliseconds
         private final double value;
 
         private PairDateValue(long date, double value) {
             this.date = date;
             this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return "["+date+","+value+"]";
         }
     }
 

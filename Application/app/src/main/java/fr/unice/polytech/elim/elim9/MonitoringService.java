@@ -2,6 +2,7 @@ package fr.unice.polytech.elim.elim9;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -46,7 +47,7 @@ public class MonitoringService extends Service {
     private void toggleOff() {
         if(receiver != null) {
             Log.d("ELIM9MonitoringService", "Shutting down listeners...");
-            unregisterReceiver(receiver);
+            try { unregisterReceiver(receiver); } catch(RuntimeException ignored) {}
 
             Log.d("ELIM9MonitoringService", "Saving DataElement to File...");
             DataElement.save(getApplicationContext().getFilesDir().getPath() +DATA_ELEMENT_FILENAME);
@@ -62,14 +63,13 @@ public class MonitoringService extends Service {
         Log.d("ELIM9MonitoringService", "Activating...");
 
         receiver = new BatteryStateReceiver();
-        /*/ Launching listeners
+        // Launching listeners
         registerReceiver(receiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
         registerReceiver(receiver, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
         registerReceiver(receiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
         registerReceiver(receiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
 
-        BatteryStateReceiver batRec = new BatteryStateReceiver(this);*/
-        //TODO Tester s'il est déjà link au évènement. Tout faire dans le BRReceiver. 1 event récupère les états de tout!
+        BatteryStateReceiver batRec = new BatteryStateReceiver();
 
         Log.d("ELIM9MonitoringService", "Active !");
     }
