@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
+import android.os.Build;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,14 +39,17 @@ public class BatteryStateReceiver extends BroadcastReceiver {
                 pushData(context);
                 switch (intent.getAction()) {
                     case Intent.ACTION_POWER_CONNECTED:
+                        isBatteryCharging = true;
                         break;
                     case Intent.ACTION_POWER_DISCONNECTED:
+                        isBatteryCharging = false;
                         break;
                     case Intent.ACTION_SCREEN_ON:
+                        isScreenActive = true;
                         break;
                     case Intent.ACTION_SCREEN_OFF:
+                        isScreenActive = false;
                         break;
-
                 }
 
                 return null;
@@ -61,8 +66,7 @@ public class BatteryStateReceiver extends BroadcastReceiver {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        DatabaseReference ref = database.getReference();
-        DatabaseReference user = ref.child("users").child(id);
+        DatabaseReference dbRef = database.getReference().child("users").child(id).child(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
 
         long time = Calendar.getInstance().getTimeInMillis();
 
@@ -98,13 +102,17 @@ public class BatteryStateReceiver extends BroadcastReceiver {
             return;
         }
 
-        user.child("dates").child(new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Calendar.getInstance().getTime()))
+        dbRef.child("dates").child(new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Calendar.getInstance().getTime()))
                 .setValue(data);
-        user.child("buildModel")
-                .setValue(android.os.Build.MODEL);
-        user.child("systemAppNb")
-                .setValue(systemAppsNb);
-        user.child("othersAppNb")
+        dbRef.child("buildId")
+                .setValue(Build.ID);
+        dbRef.child("buildVersion")
+                .setValue(Build.VERSION.BASE_OS);
+        dbRef.child("buildManufacturer")
+                .setValue(Build.MANUFACTURER);
+        dbRef.child("systemAppNb")
+                .setValue(systemAppsNb-nonSystemAppsNb);
+        dbRef.child("othersAppNb")
                 .setValue(nonSystemAppsNb);
 
         Log.d("MonitoringService", "PushedData:"+data);

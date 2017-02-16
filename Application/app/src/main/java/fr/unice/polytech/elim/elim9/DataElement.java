@@ -45,7 +45,7 @@ public class DataElement {
         double pct = count(dischActPct)*100;
 
         if(time == 0 || pct == 0) {
-            return -1;
+            return 0;
         }
         return time/pct;
     }
@@ -59,7 +59,7 @@ public class DataElement {
         double pct = count(dischInactPct)*100;
 
         if(time == 0 || pct == 0) {
-            return -1;
+            return 0;
         }
         return time/pct;
     }
@@ -73,7 +73,7 @@ public class DataElement {
         double pct = count(chActPct)*100;
 
         if(time == 0 || pct == 0) {
-            return -1;
+            return 0;
         }
         return time/pct;
     }
@@ -86,7 +86,7 @@ public class DataElement {
         double pct = count(chInactPct)*100;
 
         if(time == 0 || pct == 0) {
-            return -1;
+            return 0;
         }
         return time/pct;
     }
@@ -96,7 +96,7 @@ public class DataElement {
      */
     private double getAvgRamUsage() {
         if (dataArrays.get(ramUsage).size() == 0)
-            return -1;
+            return 0;
 
         double ram = 0;
 
