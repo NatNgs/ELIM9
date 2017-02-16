@@ -27,6 +27,16 @@
             android:enabled="true"
             android:exported="true" />
 
+        <receiver
+            android:name=".BatteryStateReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
+                <action android:name="android.intent.action.ACTION_SCREEN_ON"/>
+                <action android:name="android.intent.action.ACTION_SCREEN_OFF"/>
+            </intent-filter>
+        </receiver>
     </application>
-
 </manifest>

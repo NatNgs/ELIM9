@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -12,11 +13,13 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class MonitoringService extends IntentService {
@@ -31,6 +34,7 @@ public class MonitoringService extends IntentService {
     private boolean isBatteryCharging;
     private boolean isScreenActive;
 
+    private DataElement datas;
 
     public MonitoringService() {
         super("Monitoring Service");
@@ -55,10 +59,16 @@ public class MonitoringService extends IntentService {
         if(!isMonitoring) {
             startMinotoring();
             Log.d("MonitoringService", "StartMonitoring...");
-            for (BroadcastReceiver br : receivers) {
-                Log.d("MonitoringService", "Listen on :" + br.toString());
-                unregisterReceiver(br);
+            int numberOfNonSystemApps = 0;
+
+            List<ApplicationInfo> appList = getPackageManager().getInstalledApplications(0);
+            for(ApplicationInfo info : appList) {
+                if((info.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+                    numberOfNonSystemApps++;
+                }
             }
+            // Application number ^
+            // TODO Trouver un moyen de détecter ça de temps en temps
             isMonitoring = true;
         }
         else
@@ -90,7 +100,7 @@ public class MonitoringService extends IntentService {
         }
 
         // Preparing listeners
-        BroadcastReceiver powerConnectedReceiver = new BroadcastReceiver() {
+        /*BroadcastReceiver powerConnectedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 isBatteryCharging = true;
@@ -130,7 +140,10 @@ public class MonitoringService extends IntentService {
         receivers.add(screenUnlocked);
         registerReceiver(screenLocked, new IntentFilter(Intent.ACTION_SCREEN_OFF));
         receivers.add(screenLocked);
+        */
 
+        BatteryStateReceiver batRec = new BatteryStateReceiver();
+        //TODO Tester s'il est déjà link au évènement. Tout faire dans le BRReceiver. 1 event récupère les états de tout!
         Log.d("MonitoringService", "Active !");
     }
 
@@ -166,8 +179,12 @@ public class MonitoringService extends IntentService {
 
         final String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // TODO
-        Log.d("PushedData", "Data:"+isBatteryCharging+"/"+isScreenActive);
+        DatabaseReference ref = database.getReference();
+        DatabaseReference user = ref.child("users").child(id);
+
+        user.setValue(datas.toJson());
+
+        Log.d("PushedData", "Data:"+datas.toJson());
 
     }
 
