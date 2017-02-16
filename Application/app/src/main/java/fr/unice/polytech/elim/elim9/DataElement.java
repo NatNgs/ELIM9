@@ -1,6 +1,9 @@
 package fr.unice.polytech.elim.elim9;
 
 import android.util.Log;
+import android.widget.SectionIndexer;
+
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -104,68 +107,37 @@ public class DataElement {
     }
 
     public void putDischargeActive(long time, int pct, int pctMax) {
-        if ((lastValues.containsKey("time") && lastValues.containsKey("chargeLevel") && lastValues.containsKey("chargeLevelScale"))) {
-            List<PairDateValue> timeArray = dataArrays.get(dischActTime);
-            List<PairDateValue> pctArray = dataArrays.get(dischActPct);
-
-            timeArray.add(new PairDateValue(time,(double) pct / (double) pctMax));
-            timeArray.add(new PairDateValue(time,time / 1000.));
-
-            removeOld(timeArray, time);
-            removeOld(pctArray, time);
-        }
-
-        lastValues.put("time", time/1000.);
-        lastValues.put("chargeLevel", (double) pct);
-        lastValues.put("chargeLevelScale", (double) pctMax);
+        putTimeChargeData(time, (double)pct/(double)pctMax, dataArrays.get(dischActTime), dataArrays.get(dischActPct));
     }
     public void putChargeActive(long time, int pct, int pctMax) {
-        if ((lastValues.containsKey("time") && lastValues.containsKey("chargeLevel") && lastValues.containsKey("chargeLevelScale"))) {
-            List<PairDateValue> timeArray = dataArrays.get(chActTime);
-            List<PairDateValue> pctArray = dataArrays.get(chActPct);
-
-            timeArray.add(new PairDateValue(time,(double)pct/(double)pctMax));
-            timeArray.add(new PairDateValue(time,time/1000.));
-
-            removeOld(timeArray, time);
-            removeOld(pctArray, time);
-        }
-
-        lastValues.put("time", time/1000.);
-        lastValues.put("chargeLevel", (double) pct);
-        lastValues.put("chargeLevelScale", (double) pctMax);
+        putTimeChargeData(time, (double)pct/(double)pctMax, dataArrays.get(chActTime), dataArrays.get(chActPct));
     }
     public void putDischargeInactive(long time, int pct, int pctMax) {
-        if ((lastValues.containsKey("time") && lastValues.containsKey("chargeLevel") && lastValues.containsKey("chargeLevelScale"))) {
-            List<PairDateValue> timeArray = dataArrays.get(dischInactTime);
-            List<PairDateValue> pctArray = dataArrays.get(dischInactPct);
-
-            timeArray.add(new PairDateValue(time,(double)pct/(double)pctMax));
-            timeArray.add(new PairDateValue(time,time/1000.));
-
-            removeOld(timeArray, time);
-            removeOld(pctArray, time);
-        }
-
-        lastValues.put("time", time/1000.);
-        lastValues.put("chargeLevel", (double) pct);
-        lastValues.put("chargeLevelScale", (double) pctMax);
+        putTimeChargeData(time, (double)pct/(double)pctMax, dataArrays.get(dischInactTime), dataArrays.get(dischInactPct));
     }
     public void putChargeInactive(long time, int pct, int pctMax) {
-        if ((lastValues.containsKey("time") && lastValues.containsKey("chargeLevel") && lastValues.containsKey("chargeLevelScale"))) {
-            List<PairDateValue> timeArray = dataArrays.get(chInactTime);
-            List<PairDateValue> pctArray = dataArrays.get(chInactPct);
+        putTimeChargeData(time, (double)pct/(double)pctMax, dataArrays.get(chInactTime), dataArrays.get(chInactPct));
+    }
 
-            timeArray.add(new PairDateValue(time,(double)pct/(double)pctMax));
-            timeArray.add(new PairDateValue(time,time/1000.));
+    private void putTimeChargeData(long time, double charge, List<PairDateValue> timeArray, List<PairDateValue> pctArray) {
+        if ((lastValues.containsKey("time") && lastValues.containsKey("chargeLevel") && lastValues.containsKey("chargeLevelScale"))) {
+            double lastTime = lastValues.get("time");
+            double lastCharge = lastValues.get("chargeLevel");
+
+
+            if(charge != lastCharge) {
+                pctArray.add(new PairDateValue(time,charge - lastCharge));
+            }
+            if(time != lastTime) {
+                timeArray.add(new PairDateValue(time, time - lastTime));
+            }
 
             removeOld(timeArray, time);
             removeOld(pctArray, time);
         }
 
         lastValues.put("time", time/1000.);
-        lastValues.put("chargeLevel", (double) pct);
-        lastValues.put("chargeLevelScale", (double) pctMax);
+        lastValues.put("chargeLevel", charge);
     }
 
     private void removeOld(List<PairDateValue> array, long date) {
@@ -193,9 +165,11 @@ public class DataElement {
             if (!f.exists() || f.delete())
                 f.createNewFile();
 
+            String json = toSaveStr(instance.dataArrays);
             FileOutputStream fos = new FileOutputStream(f);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(DataElement.instance.dataArrays);
+            oos.writeObject(json);
+            Log.e("DataElement", "Saved: "+json);
             oos.close();
             fos.close();
         } catch (IOException e) {
@@ -208,8 +182,10 @@ public class DataElement {
         try {
             FileInputStream fis = new FileInputStream(f);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            Map<DataKind, List<PairDateValue>> map = (Map<DataKind, List<PairDateValue>>) ois.readObject();
+            String json = (String) ois.readObject();
+            Log.e("DataElement", "Loaded: "+json);
 
+            Map<DataKind, List<PairDateValue>> map = fromSaveStr(json);
             if (map != null) {
                 instance.dataArrays.clear();
                 instance.dataArrays.putAll(map);
@@ -217,14 +193,13 @@ public class DataElement {
 
             ois.close();
             fis.close();
-        } catch (FileNotFoundException ignored) {
-        } catch (IOException | ClassNotFoundException e) {
-            Log.e("DataElement", "Load:"+e.getMessage(), e);
+        } catch (Exception e) {
+            Log.d("DataElement", "Cannot load: "+e.toString(), e);
         }
     }
 
 
-    enum DataKind {
+    enum DataKind implements Serializable {
         dischActTime,
         dischInactTime,
         chActTime,
@@ -236,13 +211,55 @@ public class DataElement {
         ramUsage
     }
 
-    private class PairDateValue {
-        private final long date;
+    public static class PairDateValue {
+        private long date;
         private final double value;
 
         private PairDateValue(long date, double value) {
             this.date = date;
             this.value = value;
         }
+    }
+
+    public static String toSaveStr(Map<DataKind, List<PairDateValue>> dataArrays) {
+        StringBuilder sb = new StringBuilder();
+        for(Map.Entry<DataKind, List<PairDateValue>> entry : dataArrays.entrySet()) {
+            if(!entry.getValue().isEmpty()) {
+            sb.append(entry.getKey().name()).append(":");
+
+                for(PairDateValue pair : entry.getValue()) {
+                    sb.append(pair.date).append("/").append(pair.value).append(",");
+                }
+
+                sb.deleteCharAt(sb.length()-1);
+                sb.append(";");
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public static Map<DataKind, List<PairDateValue>> fromSaveStr(String saveStr) {
+        Map<DataKind, List<PairDateValue>> map = new HashMap<>();
+        for(DataKind kind : DataKind.values()) {
+            map.put(kind, new ArrayList<PairDateValue>());
+        }
+
+        String[] entries = saveStr.split(";");
+        for(String entry : entries) {
+            if(!entry.isEmpty()) {
+                String[] splitted = entry.split(":");
+                try {
+                    DataKind kind = DataKind.valueOf(splitted[0]);
+                    String[] pairs = splitted[1].split(",");
+                    for (String pair : pairs) {
+                        String[] pairSplitted = pair.split("/");
+                        PairDateValue pdv = new PairDateValue(Long.valueOf(pairSplitted[0]), Double.valueOf(pairSplitted[1]));
+                        map.get(kind).add(pdv);
+                    }
+                } catch(IllegalArgumentException ignored) {} // when DataKind.valueOf fail
+            }
+        }
+        return map;
     }
 }
