@@ -4,12 +4,12 @@ apply plugin: 'com.google.gms.google-services'
 android {
     signingConfigs {
     }
-    compileSdkVersion 25
+    compileSdkVersion 21
     buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "fr.unice.polytech.elim.elim9"
-        minSdkVersion 19
-        targetSdkVersion 23
+        minSdkVersion 21
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

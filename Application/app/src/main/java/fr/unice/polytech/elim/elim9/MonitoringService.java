@@ -1,20 +1,20 @@
 package fr.unice.polytech.elim.elim9;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.BatteryManager;
-import android.os.Build;
-import android.os.PowerManager;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
@@ -66,7 +66,7 @@ public class MonitoringService extends IntentService {
     }
 
     private void toggleOff() {
-        if(true) {
+        if(isMonitoring) {
             Log.d("MonitoringService", "Shutting down listeners...");
             for (BroadcastReceiver br : receivers) {
                 Log.d("MonitoringService", "Shutting down listener :" + br.toString());
@@ -93,29 +93,29 @@ public class MonitoringService extends IntentService {
         BroadcastReceiver powerConnectedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                isBatteryCharging = true;
                 pushData();
+                isBatteryCharging = true;
             }
         };
         BroadcastReceiver powerDisconnectedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                isBatteryCharging = false;
                 pushData();
+                isBatteryCharging = false;
             }
         };
         BroadcastReceiver screenUnlocked = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                isScreenActive = true;
                 pushData();
+                isScreenActive = true;
             }
         };
         BroadcastReceiver screenLocked = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                isScreenActive = false;
                 pushData();
+                isScreenActive = false;
             }
         };
 
@@ -159,16 +159,35 @@ public class MonitoringService extends IntentService {
     }
 
 
+    @SuppressLint("SimpleDateFormat")
     private void pushData() {
-
         // Get a reference to our posts
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-
         final String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // TODO
-        Log.d("PushedData", "Data:"+isBatteryCharging+"/"+isScreenActive);
+        long time = Calendar.getInstance().getTimeInMillis();
 
+        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = getApplicationContext().registerReceiver(null, ifilter);
+        assert batteryStatus != null;
+        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int levelScale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+        if(isScreenActive && isBatteryCharging) {
+            DataElement.instance.putChargeActive(time,level,levelScale);
+        } else if(isScreenActive){
+            DataElement.instance.putDischargeActive(time,level,levelScale);
+        } else if(isBatteryCharging){
+            DataElement.instance.putChargeInactive(time,level,levelScale);
+        } else{
+            DataElement.instance.putDischargeInactive(time,level,levelScale);
+        }
+
+        // TODO remove from here if want disable automatically push
+        String jsonStr = DataElement.instance.toJsonString();
+        DatabaseReference ref = database.getReference("users/"+id);
+        ref.setValue(new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Calendar.getInstance()),
+                jsonStr);
     }
 
     public static File getDataFile() {
