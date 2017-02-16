@@ -2,12 +2,16 @@ package fr.unice.polytech.elim.elim9;
 
 import android.annotation.SuppressLint;
 import android.app.IntentService;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.os.BatteryManager;
+import android.os.Binder;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,74 +25,50 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MonitoringService extends IntentService {
-    private static final String DATA_FILENAME = "ELIM9MonitoredData";
+public class MonitoringService extends Service {
+    private static final String DATA_ELEMENT_FILENAME = "elim9.save";
     protected static final String PARAM_ON_OFF = "activation";
-
-    private static File dataFile = null;
-
-    private final Set<BroadcastReceiver> receivers = new HashSet<>();
-    private boolean isMonitoring = false;
-    private boolean isBatteryCharging;
-    private boolean isScreenActive;
-
-    private DataElement datas;
+    private BatteryStateReceiver receiver;
 
     public MonitoringService() {
-        super("Monitoring Service");
+        super();
         Log.d("MonitoringService","Instantiating new Monitoring Service at "+ Calendar.getInstance().getTimeInMillis());
-        isBatteryCharging = isBatteryCharging();
-        isScreenActive = isScreenActive();
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        boolean msg = intent.getBooleanExtra(PARAM_ON_OFF, false);
+    public void onCreate() {
+        Log.d("ELIM9MonitoringService","MonitoringService created");
+        super.onCreate();
+    }
 
-        if(msg) {
-            toggleOn();
-        } else {
-            Log.d("MonitoringService", "Received message: "+msg);
-            toggleOff();
-        }
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("ELIM9MonitoringService","MonitoringService started");
+        toggleOn();
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void toggleOn() {
-        if(!isMonitoring) {
+        if(receiver == null) {
             Log.d("MonitoringService", "Loading DataElement...");
-            DataElement.load();
+            DataElement.load(getApplicationContext().getFilesDir().getPath() +DATA_ELEMENT_FILENAME);
 
             Log.d("MonitoringService", "StartMonitoring...");
-
-            int numberOfNonSystemApps = 0;
-
-            List<ApplicationInfo> appList = getPackageManager().getInstalledApplications(0);
-            for(ApplicationInfo info : appList) {
-                if((info.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
-                    numberOfNonSystemApps++;
-                }
-            }
-            // Application number ^
-
             startMonitoring();
-            isMonitoring = true;
         }
         else
             Log.e("MonitoringService", "Already Active");
     }
 
     private void toggleOff() {
-        if(isMonitoring) {
+        if(receiver != null) {
             Log.d("MonitoringService", "Shutting down listeners...");
-            for (BroadcastReceiver br : receivers) {
-                unregisterReceiver(br);
-            }
+            unregisterReceiver(receiver);
 
             Log.d("MonitoringService", "Saving DataElement to File...");
-            DataElement.save();
+            DataElement.save(getApplicationContext().getFilesDir().getPath() +DATA_ELEMENT_FILENAME);
 
-            receivers.clear();
-            isMonitoring = false;
+            receiver = null;
             Log.d("MonitoringService", "Inactive !");
         } else {
             Log.e("MonitoringService", "Already Inactive");
@@ -98,127 +78,37 @@ public class MonitoringService extends IntentService {
     public void startMonitoring(){
         Log.d("MonitoringService", "Activating...");
 
-        dataFile = new File(getCacheDir(), DATA_FILENAME);
-        if(dataFile.exists()) {
-            //dataFile.delete();
-            Log.d("MonitoringService", "Ancient DataFile deleted");
-        }
-
-        // Preparing listeners
-        /*BroadcastReceiver powerConnectedReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                pushData();
-                isBatteryCharging = true;
-            }
-        };
-        BroadcastReceiver powerDisconnectedReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                pushData();
-                isBatteryCharging = false;
-            }
-        };
-        BroadcastReceiver screenUnlocked = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                pushData();
-                isScreenActive = true;
-            }
-        };
-        BroadcastReceiver screenLocked = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                pushData();
-                isScreenActive = false;
-            }
-        };
-
-
-
+        receiver = new BatteryStateReceiver();
         // Launching listeners
-        registerReceiver(powerConnectedReceiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
-        receivers.add(powerConnectedReceiver);
-        registerReceiver(powerDisconnectedReceiver, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
-        receivers.add(powerDisconnectedReceiver);
-        registerReceiver(screenUnlocked, new IntentFilter(Intent.ACTION_SCREEN_ON));
-        receivers.add(screenUnlocked);
-        registerReceiver(screenLocked, new IntentFilter(Intent.ACTION_SCREEN_OFF));
-        receivers.add(screenLocked);
-        */
+        registerReceiver(receiver, new IntentFilter(Intent.ACTION_POWER_CONNECTED));
+        registerReceiver(receiver, new IntentFilter(Intent.ACTION_POWER_DISCONNECTED));
+        registerReceiver(receiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
+        registerReceiver(receiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
 
-        BatteryStateReceiver batRec = new BatteryStateReceiver();
+        //BatteryStateReceiver batRec = new BatteryStateReceiver(this);
         //TODO Tester s'il est déjà link au évènement. Tout faire dans le BRReceiver. 1 event récupère les états de tout!
+
         Log.d("MonitoringService", "Active !");
     }
 
-    public boolean isBatteryCharging() {
-        //TODO
-        // Battery is charging or not ?
-        /*Log.d(this.toString(), "yolo");
-        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-
-        Log.d("d,ffd,",ifilter.toString());
-        Intent batteryStatus = registerReceiver(null, ifilter);
-        int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-        return status == BatteryManager.BATTERY_STATUS_CHARGING
-                || status == BatteryManager.BATTERY_STATUS_FULL; */
-        return false;
+    @Override
+    public void onDestroy() {
+        Log.d("ELIM9MonitoringService","MonitoringService destroyed");
+        toggleOff();
+        super.onDestroy();
     }
 
-    public boolean isScreenActive() {
-        // TODO
-        /*PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            return powerManager.isInteractive();
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
+
+    // This is the object that receives interactions from clients.  See
+    // RemoteService for a more complete example.
+    private final IBinder mBinder = new Binder() {
+        MonitoringService getService() {
+            return MonitoringService.this;
         }
-        return powerManager.isScreenOn();
-        */
-        return true;
-    }
-
-
-    @SuppressLint("SimpleDateFormat")
-    private void pushData() {
-        // Get a reference to our posts
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        DatabaseReference ref = database.getReference();
-        DatabaseReference user = ref.child("users").child(id);
-
-        long time = Calendar.getInstance().getTimeInMillis();
-
-        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        Intent batteryStatus = getApplicationContext().registerReceiver(null, ifilter);
-        assert batteryStatus != null;
-        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        int levelScale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-        if(isScreenActive && isBatteryCharging) {
-            DataElement.instance.putChargeActive(time,level,levelScale);
-        } else if(isScreenActive){
-            DataElement.instance.putDischargeActive(time,level,levelScale);
-        } else if(isBatteryCharging){
-            DataElement.instance.putChargeInactive(time,level,levelScale);
-        } else{
-            DataElement.instance.putDischargeInactive(time,level,levelScale);
-        }
-
-        // TODO remove from here for disable automatically push
-        String json = DataElement.instance.toJsonString();
-        user.setValue(
-                new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Calendar.getInstance()),
-                json);
-
-        user.setValue(
-                "buildModel",
-                android.os.Build.MODEL);
-
-        Log.d("PushedData", "Data:"+json);
-    }
-
-    public static File getDataFile() {
-        return dataFile;
-    }
+    };
 }

@@ -5,26 +5,10 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
-import static fr.unice.polytech.elim.elim9.DataElement.DataKind.chActPct;
-import static fr.unice.polytech.elim.elim9.DataElement.DataKind.chActTime;
-import static fr.unice.polytech.elim.elim9.DataElement.DataKind.chInactPct;
-import static fr.unice.polytech.elim.elim9.DataElement.DataKind.chInactTime;
-import static fr.unice.polytech.elim.elim9.DataElement.DataKind.dischActPct;
-import static fr.unice.polytech.elim.elim9.DataElement.DataKind.dischActTime;
-import static fr.unice.polytech.elim.elim9.DataElement.DataKind.dischInactPct;
-import static fr.unice.polytech.elim.elim9.DataElement.DataKind.dischInactTime;
-import static fr.unice.polytech.elim.elim9.DataElement.DataKind.ramUsage;
+import static fr.unice.polytech.elim.elim9.DataElement.DataKind.*;
 
 /**
  * Created by nathael on 16/02/17.
@@ -191,29 +175,23 @@ public class DataElement {
     }
 
 
-    public String toJsonString() {
-        try {
-            JSONObject object = new JSONObject();
+    public Map<String, Object> toMap() {
+        Map<String,Object> ret = new HashMap<>();
 
-            object.accumulate("chargeActive", getChargeActiveAvgTime());
-            object.accumulate("chargeInactive", getChargeInactiveAvgTime());
-            object.accumulate("dischargeActive", getDischargeActiveAvgTime());
-            object.accumulate("dischargeInactive", getDischargeInactiveAvgTime());
-            object.accumulate("ramUsage", getAvgRamUsage());
-            return object.toString();
-        } catch (JSONException e) {
-            Log.e("DataElement",e.getMessage(), e);
-        }
+        ret.put("chargeActive", getChargeActiveAvgTime());
+        ret.put("chargeInactive", getChargeInactiveAvgTime());
+        ret.put("dischargeActive", getDischargeActiveAvgTime());
+        ret.put("dischargeInactive", getDischargeInactiveAvgTime());
+        ret.put("ramUsage", getAvgRamUsage());
 
-        return null;
+        return ret;
     }
 
-    private final static String SAVE_FILE_NAME = "elim9.save";
-    public static void save() {
+    public static void save(final String SAVE_FILE_NAME) {
         File f = new File(SAVE_FILE_NAME);
         try {
-            if ((f.exists() && !f.delete()) || f.createNewFile())
-                throw new IOException("Cannot Delete file "+f.getCanonicalPath());
+            if (!f.exists() || f.delete())
+                f.createNewFile();
 
             FileOutputStream fos = new FileOutputStream(f);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -225,20 +203,21 @@ public class DataElement {
         }
     }
 
-    public static void load() {
+    public static void load(final String SAVE_FILE_NAME) {
         File f = new File(SAVE_FILE_NAME);
         try {
             FileInputStream fis = new FileInputStream(f);
             ObjectInputStream ois = new ObjectInputStream(fis);
             Map<DataKind, List<PairDateValue>> map = (Map<DataKind, List<PairDateValue>>) ois.readObject();
 
-            if(map != null) {
+            if (map != null) {
                 instance.dataArrays.clear();
                 instance.dataArrays.putAll(map);
             }
 
             ois.close();
             fis.close();
+        } catch (FileNotFoundException ignored) {
         } catch (IOException | ClassNotFoundException e) {
             Log.e("DataElement", "Load:"+e.getMessage(), e);
         }

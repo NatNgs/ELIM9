@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.Switch;
+import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,12 +27,23 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        if(FirebaseAuth.getInstance().getCurrentUser() != null) {
+            final String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            ((TextView) findViewById(R.id.main_id_value)).setText(id);
+        } else {
+            ((TextView) findViewById(R.id.main_id_value)).setText(R.string.disconnected_status);
+        }
     }
 
     private void onActivationSwitchStateChanged(boolean b) {
+        Log.d("ELIM9MainActivity","Activation state set to "+b);
         Intent serviceIntent = new Intent(this, MonitoringService.class);
-        serviceIntent.putExtra(MonitoringService.PARAM_ON_OFF, b);
-        startService(serviceIntent);
+        if(b) {
+            startService(serviceIntent);
+        } else {
+            stopService(serviceIntent);
+        }
     }
 
     public void onClickDisconnect(View view) {
