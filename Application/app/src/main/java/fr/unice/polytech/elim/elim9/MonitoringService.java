@@ -1,15 +1,13 @@
 package fr.unice.polytech.elim.elim9;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
-import android.os.AsyncTask;
 import android.os.BatteryManager;
-import android.os.Build;
-import android.os.PowerManager;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,13 +15,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class MonitoringService extends IntentService {
-    private static final String phoneModel = android.os.Build.MODEL;
     private static final String DATA_FILENAME = "ELIM9MonitoredData";
     protected static final String PARAM_ON_OFF = "activation";
 
@@ -57,8 +55,11 @@ public class MonitoringService extends IntentService {
 
     private void toggleOn() {
         if(!isMonitoring) {
-            startMinotoring();
+            Log.d("MonitoringService", "Loading DataElement...");
+            DataElement.load();
+
             Log.d("MonitoringService", "StartMonitoring...");
+
             int numberOfNonSystemApps = 0;
 
             List<ApplicationInfo> appList = getPackageManager().getInstalledApplications(0);
@@ -68,7 +69,8 @@ public class MonitoringService extends IntentService {
                 }
             }
             // Application number ^
-            // TODO Trouver un moyen de détecter ça de temps en temps
+
+            startMonitoring();
             isMonitoring = true;
         }
         else
@@ -76,12 +78,15 @@ public class MonitoringService extends IntentService {
     }
 
     private void toggleOff() {
-        if(true) {
+        if(isMonitoring) {
             Log.d("MonitoringService", "Shutting down listeners...");
             for (BroadcastReceiver br : receivers) {
-                Log.d("MonitoringService", "Shutting down listener :" + br.toString());
                 unregisterReceiver(br);
             }
+
+            Log.d("MonitoringService", "Saving DataElement to File...");
+            DataElement.save();
+
             receivers.clear();
             isMonitoring = false;
             Log.d("MonitoringService", "Inactive !");
@@ -90,7 +95,7 @@ public class MonitoringService extends IntentService {
         }
     }
 
-    public void startMinotoring(){
+    public void startMonitoring(){
         Log.d("MonitoringService", "Activating...");
 
         dataFile = new File(getCacheDir(), DATA_FILENAME);
@@ -103,29 +108,29 @@ public class MonitoringService extends IntentService {
         /*BroadcastReceiver powerConnectedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                isBatteryCharging = true;
                 pushData();
+                isBatteryCharging = true;
             }
         };
         BroadcastReceiver powerDisconnectedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                isBatteryCharging = false;
                 pushData();
+                isBatteryCharging = false;
             }
         };
         BroadcastReceiver screenUnlocked = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                isScreenActive = true;
                 pushData();
+                isScreenActive = true;
             }
         };
         BroadcastReceiver screenLocked = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                isScreenActive = false;
                 pushData();
+                isScreenActive = false;
             }
         };
 
@@ -162,6 +167,7 @@ public class MonitoringService extends IntentService {
     }
 
     public boolean isScreenActive() {
+        // TODO
         /*PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             return powerManager.isInteractive();
@@ -172,20 +178,44 @@ public class MonitoringService extends IntentService {
     }
 
 
+    @SuppressLint("SimpleDateFormat")
     private void pushData() {
-
         // Get a reference to our posts
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-
         final String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         DatabaseReference ref = database.getReference();
         DatabaseReference user = ref.child("users").child(id);
 
-        user.setValue(datas.toJson());
+        long time = Calendar.getInstance().getTimeInMillis();
 
-        Log.d("PushedData", "Data:"+datas.toJson());
+        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = getApplicationContext().registerReceiver(null, ifilter);
+        assert batteryStatus != null;
+        int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int levelScale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
+        if(isScreenActive && isBatteryCharging) {
+            DataElement.instance.putChargeActive(time,level,levelScale);
+        } else if(isScreenActive){
+            DataElement.instance.putDischargeActive(time,level,levelScale);
+        } else if(isBatteryCharging){
+            DataElement.instance.putChargeInactive(time,level,levelScale);
+        } else{
+            DataElement.instance.putDischargeInactive(time,level,levelScale);
+        }
+
+        // TODO remove from here for disable automatically push
+        String json = DataElement.instance.toJsonString();
+        user.setValue(
+                new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Calendar.getInstance()),
+                json);
+
+        user.setValue(
+                "buildModel",
+                android.os.Build.MODEL);
+
+        Log.d("PushedData", "Data:"+json);
     }
 
     public static File getDataFile() {
