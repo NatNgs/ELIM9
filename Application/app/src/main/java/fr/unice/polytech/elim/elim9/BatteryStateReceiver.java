@@ -124,8 +124,6 @@ public class BatteryStateReceiver extends BroadcastReceiver {
 
         DatabaseReference childRef = dbRef.child("dates").child(new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Calendar.getInstance().getTime()));
         childRef.setValue(data);
-        childRef.child("lastBatteryValue")
-                .setValue(level+"/"+levelScale);
         dbRef.child("buildId")
                 .setValue(Build.ID);
         dbRef.child("systemAppNb")

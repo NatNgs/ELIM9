@@ -14,6 +14,9 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private String ramAverage;
     private String ramPCT;
 
-    private String BatterygoodORbad;
+    private double good;
+    private double bad;
 
     //You have "applicationNumber" applications installed, it's more than "applicationPCT" of our others users
     private String applicationNumber;
@@ -50,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
             ((TextView) findViewById(R.id.main_id_value)).setText(R.string.disconnected_status);
         }
         listenResult();
+
     }
 
     private void onActivationSwitchStateChanged(boolean b) {
@@ -72,9 +77,11 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param value Between 0 and 1 included, else progress will be indeterminate
      */
-    public void changeProgressBarValue(double value) {
+    public void changeProgressBarValue(double good, double bad) {
         ProgressBar progressBar = (ProgressBar)findViewById(R.id.main_prediction_progress);
         final int PRECISION = progressBar.getWidth();
+
+        double value = good * (1-bad);
 
         if(value < 0 || value > 1 || PRECISION == 0) {
             progressBar.setIndeterminate(true);
@@ -84,8 +91,8 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             progressBar.setIndeterminate(false);
-            progressBar.setProgress((int) ((1 - value) * PRECISION)); // because progressbar is inverted
             progressBar.setMax(PRECISION);
+            progressBar.setProgress((int) ((value) * PRECISION)); // because progressbar is inverted
         }
     }
 
@@ -95,17 +102,42 @@ public class MainActivity extends AppCompatActivity {
         final String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         DatabaseReference dbRef = database.getReference().child("results").child(id).child(Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID));
-        dbRef.setValue("Yolo");
 
         dbRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue()!= null) {
-                    dataSnapshot.child("applicationNumber").getValue();
-                    dataSnapshot.child("applicationPCT").getValue();
-                    dataSnapshot.child("batteryState").getValue();
-                    dataSnapshot.child("ramAverage").getValue();
-                    dataSnapshot.child("ramPCT").getValue();
+                    Log.d("MainActivityResult : ", dataSnapshot.toString());
+
+                    Log.d("Test", dataSnapshot.getValue().toString());
+                    JSONObject obj = null;
+                    try {
+                        obj = new JSONObject(dataSnapshot.getValue().toString());
+
+                        Log.d("applicationNumber", obj.getString("applicationNumber"));
+                        Log.d("applicationPCT", obj.getString("applicationPCT"));
+                        Log.d("ramAverage", obj.getString("ramAverage"));
+                        Log.d("ramPCT", obj.getString("ramPCT"));
+
+
+                        applicationNumber = obj.getString("applicationNumber");
+                        applicationPCT = obj.getString("applicationPCT");
+                        ramAverage = obj.getString("ramAverage");
+                        ramPCT = obj.getString("ramPCT");
+                        good = obj.getDouble("good");
+                        bad = obj.getDouble("bad");
+
+                        ((TextView)  findViewById(R.id.AppsPCT)).setText(applicationPCT);
+                        ((TextView)  findViewById(R.id.RamPCT)).setText(ramPCT);
+                        ((TextView)  findViewById(R.id.RamAverage)).setText(ramAverage);
+                        ((TextView)  findViewById(R.id.Apps)).setText(applicationNumber);
+
+                        changeProgressBarValue(good, bad);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
                 }
             }
 

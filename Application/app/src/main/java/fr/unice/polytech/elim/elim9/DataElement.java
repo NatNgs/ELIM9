@@ -56,7 +56,7 @@ public class DataElement {
         Log.e("ELIM9DataElement","dischActPct:"+dataArrays.get(dischActPct));
         Log.e("ELIM9DataElement","time="+time+", pct="+pct+", will return "+((time/10)/pct));
 
-        if(time == 0 || pct <= MIN_PCT) {
+        if(time == 0 || Math.abs(pct) <= MIN_PCT) {
             return 0;
         }
         return (time)/pct; // ((time/1000 > seconds)/ %)*100 > s/100%
@@ -74,7 +74,7 @@ public class DataElement {
         Log.e("ELIM9DataElement","dischInactPct:"+dataArrays.get(dischInactPct));
         Log.e("ELIM9DataElement","time="+time+", pct="+pct+", will return "+((time/10)/pct));
 
-        if(time == 0 || pct <= MIN_PCT) {
+        if(time == 0 || Math.abs(pct) <= MIN_PCT) {
             return 0;
         }
         return (time)/pct; // ((time > seconds)/ %)*100 > s/100%
@@ -90,10 +90,10 @@ public class DataElement {
 
         Log.e("ELIM9DataElement","chActTime:"+dataArrays.get(chActTime));
         Log.e("ELIM9DataElement","chActPct:"+dataArrays.get(chActPct));
-        Log.e("ELIM9DataElement","time="+time+", pct="+pct+", will return "+((time/10)/pct));
+        Log.e("ELIM9DataElement","time="+time+", pct="+pct+", will return "+((time)/pct));
 
 
-        if(time == 0 || pct <= MIN_PCT) {
+        if(time == 0 || Math.abs(pct) <= MIN_PCT) {
             return 0;
         }
         return (time)/pct; // ((time > seconds)/ %)*100 > s/100%
@@ -110,7 +110,7 @@ public class DataElement {
         Log.e("ELIM9DataElement","chInactPct:"+dataArrays.get(chInactPct));
         Log.e("ELIM9DataElement","time="+time+", pct="+pct+", will return "+((time/10)/pct));
 
-        if(time == 0 || pct <= MIN_PCT) {
+        if(time == 0 || Math.abs(pct) <= MIN_PCT) {
             return 0;
         }
         return (time)/pct; // ((time > seconds)/ %)*100 > s/100%
