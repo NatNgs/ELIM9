@@ -61,7 +61,7 @@ public class User {
 
         for(Device d : devices.values()) {
             int dCount = d.countDataSnapshot();
-            if(dCount < i)
+            if(dCount <= i)
                 i-= dCount;
             else
                 return d.getAddressAt(i);

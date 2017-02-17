@@ -1,5 +1,9 @@
 package fr.unice.polytech.elim.elim9;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -54,15 +58,33 @@ public class RestFireClient {
 		return null;
 	}
 
-	public String postToFire(String address, String post) {
+	public void postToFire0(String address, String post) {
 		try {
-			URI url = new URI((this.url + "results/" + address + "/.json").replace(" ", "%20"));
-			/*HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			URL url = new URL((this.url + "results/" + address + "/.json").replace(" ", "%20"));
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestMethod("POST");
 			conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");
-			conn.setRequestProperty("Content-Type", "application/json");*/
+			conn.setRequestProperty("Content-Type", "application/json");
 
+
+			OutputStream os = conn.getOutputStream();
+			os.write(post.getBytes());
+			os.flush();
+
+			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
+				System.err.println("Failed : HTTP error code at "
+						+ url + ": "
+						+ conn.getResponseCode() + "\n"+conn.getResponseMessage());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void postToFire1(String address, String post) {
+		try {
+			URI url = new URI((this.url + "results/" + address + "/.json").replace(" ", "%20"));
 
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			HttpPatch httpPatch = new HttpPatch(url);
@@ -70,45 +92,27 @@ public class RestFireClient {
 			InputStreamEntity reqEntity = new InputStreamEntity(
 					new ByteArrayInputStream(post.getBytes()), -1, ContentType.APPLICATION_OCTET_STREAM);
 			reqEntity.setChunked(true);
-			// It may be more appropriate to use FileEntity class in this particular
-			// instance but we are using a more generic InputStreamEntity to demonstrate
-			// the capability to stream out data from any arbitrary source
-			//
-			// FileEntity entity = new FileEntity(file, "binary/octet-stream");
 
 			httpPatch.setEntity(reqEntity);
 
 			CloseableHttpResponse response = httpClient.execute(httpPatch);
+			System.out.println(url + "\n"+response.toString());
 
-			//////////////////////////////////////////////////////////
-			/*OutputStream os = conn.getOutputStream();
-			os.write(post.getBytes());
-			os.flush();
-
-			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-				throw new RuntimeException("Failed : HTTP error code at "
-						+ url + ": "
-						+ conn.getResponseCode() + "\n"+conn.getResponseMessage());
-			}
-
-			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-			String output="", temp;
-			while ((temp = br.readLine()) != null) {
-				output += temp;
-			}
-
-			conn.disconnect();
-			return output;
-
-		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace();
-		}*/
-			return null;
 		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
+	}
 
-		return null;
+	public void postToFire2(String address, Serializable post) {
+		try {
+			HttpResponse<JsonNode> jsonResponse = Unirest.patch((this.url + "results/.json").replace(" ", "%20"))
+					.header("accept", "application/json")
+					.body("{\""+address+"\":"+post+"}")
+					.asJson();
+
+			System.out.println("Response = "+jsonResponse.getStatus()+":"+jsonResponse.getStatusText()+"\n"+jsonResponse.getBody());
+		} catch (UnirestException e) {
+			e.printStackTrace();
+		}
 	}
 }

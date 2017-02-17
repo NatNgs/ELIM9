@@ -51,7 +51,7 @@ public class Device {
             if(map.containsKey("feedClass")) {
                 feedDates.add(date.getKey());
             }
-            if(lastDate == null || date.getKey().compareTo(lastDate) < 0) {
+            if(lastDate == null || date.getKey().compareTo(lastDate) > 0) {
                 lastDate = date.getKey();
             }
         }

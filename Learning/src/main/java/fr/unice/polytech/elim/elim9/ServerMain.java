@@ -1,5 +1,6 @@
 package fr.unice.polytech.elim.elim9;
 
+import com.google.gson.Gson;
 import fr.unice.polytech.elim.elim9.firebasearchi.Device;
 import fr.unice.polytech.elim.elim9.firebasearchi.Users;
 import quickml.data.PredictionMap;
@@ -79,7 +80,7 @@ public class ServerMain {
 
 
     private void predictingPhase() {
-        Device.select(Device.VIEW_ALL);
+        Device.select(Device.VIEW_ONLY_LAST);
 
         for(int i=0; i<users.countDataSnapshot(); i++) {
             Map<String, Serializable> snapshot = users.getDataSnapshot(i);
@@ -92,7 +93,10 @@ public class ServerMain {
             value.put("ramPct", 0.42);
 
             // TODO
-            rfc.postToFire(users.getAddressAt(i), prediction.toString());
+            System.out.println("Try to send:"+new Gson().toJson(value));
+            for(Serializable key : value.keySet()) {
+                rfc.postToFire2(users.getAddressAt(i)+"/"+key, value.get(key));
+            }
         }
 
         rf.learn();
