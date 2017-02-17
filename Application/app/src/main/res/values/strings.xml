@@ -14,7 +14,7 @@
     <string name="my_id_label">My id:</string>
     <string name="disconnected_status">[disconnected]</string>
 
-    <string name="RamBefore">You consume less RAM than </string>
+    <string name="RamBefore">You consume less RAM than   </string>
 
-    <string name="RamAfter">[disconnected]</string>
+    <string name="RamAfter">   of all our application users</string>
 </resources>
