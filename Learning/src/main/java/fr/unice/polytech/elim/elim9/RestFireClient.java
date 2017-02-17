@@ -1,16 +1,25 @@
 package fr.unice.polytech.elim.elim9;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPatch;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
+import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 public class RestFireClient {
 
 	private final String url = "https://elim9-76267.firebaseio.com/";
-		
+
 	private String userID = "-1";
 
 
@@ -28,9 +37,9 @@ public class RestFireClient {
 			}
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(
-				(conn.getInputStream())));
+					(conn.getInputStream())));
 
-			StringBuilder output= new StringBuilder();
+			StringBuilder output = new StringBuilder();
 			String temp;
 			while ((temp = br.readLine()) != null) {
 				output.append(temp);
@@ -45,26 +54,44 @@ public class RestFireClient {
 		return null;
 	}
 
-	public String postToFire(String post){
+	public String postToFire(String address, String post) {
 		try {
-			URL url = new URL(this.url + "results.json");
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			URI url = new URI((this.url + "results/" + address + "/.json").replace(" ", "%20"));
+			/*HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/json");
+			conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");
+			conn.setRequestProperty("Content-Type", "application/json");*/
 
 
-			OutputStream os = conn.getOutputStream();
+			CloseableHttpClient httpClient = HttpClients.createDefault();
+			HttpPatch httpPatch = new HttpPatch(url);
+
+			InputStreamEntity reqEntity = new InputStreamEntity(
+					new ByteArrayInputStream(post.getBytes()), -1, ContentType.APPLICATION_OCTET_STREAM);
+			reqEntity.setChunked(true);
+			// It may be more appropriate to use FileEntity class in this particular
+			// instance but we are using a more generic InputStreamEntity to demonstrate
+			// the capability to stream out data from any arbitrary source
+			//
+			// FileEntity entity = new FileEntity(file, "binary/octet-stream");
+
+			httpPatch.setEntity(reqEntity);
+
+			CloseableHttpResponse response = httpClient.execute(httpPatch);
+
+			//////////////////////////////////////////////////////////
+			/*OutputStream os = conn.getOutputStream();
 			os.write(post.getBytes());
 			os.flush();
 
 			if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-				throw new RuntimeException("Failed : HTTP error code : "
-					+ conn.getResponseCode());
+				throw new RuntimeException("Failed : HTTP error code at "
+						+ url + ": "
+						+ conn.getResponseCode() + "\n"+conn.getResponseMessage());
 			}
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					(conn.getInputStream())));
+			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
 			String output="", temp;
 			while ((temp = br.readLine()) != null) {
@@ -74,9 +101,14 @@ public class RestFireClient {
 			conn.disconnect();
 			return output;
 
-		} catch (IOException e) {
+		} catch (IOException | URISyntaxException e) {
+			e.printStackTrace();
+		}*/
+			return null;
+		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
+
 		return null;
 	}
 }

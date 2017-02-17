@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,9 +15,10 @@ import java.util.Map;
 public class User {
     private Map<String, Device> devices = new HashMap<>();
 
-    public User() {}
-    public User(String json) {
-        this();
+    private final String address;
+
+    public User(String address, String json) {
+        this.address = address;
         fromJson(json);
     }
 
@@ -26,7 +28,7 @@ public class User {
         JsonObject object = parser.parse(json).getAsJsonObject();
 
         for(Map.Entry<String, JsonElement> entry : object.entrySet()) {
-            devices.put(entry.getKey(), new Device(entry.getValue().toString()));
+            devices.put(entry.getKey(), new Device(address+"/"+entry.getKey(), entry.getValue().toString()));
         }
     }
 
@@ -44,10 +46,25 @@ public class User {
 
         for(Device d : devices.values()) {
             int dCount = d.countDataSnapshot();
-            if(dCount < i)
+            if(dCount <= i)
                 i-= dCount;
             else
                 return d.getDataSnapshot(i);
+        }
+
+        return null;
+    }
+
+    public String getAddressAt(int i) {
+        if(i<0 || i >= countDataSnapshot())
+            return null;
+
+        for(Device d : devices.values()) {
+            int dCount = d.countDataSnapshot();
+            if(dCount < i)
+                i-= dCount;
+            else
+                return d.getAddressAt(i);
         }
 
         return null;

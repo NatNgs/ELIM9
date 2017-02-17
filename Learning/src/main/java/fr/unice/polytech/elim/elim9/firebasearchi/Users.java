@@ -25,7 +25,7 @@ public class Users {
         JsonObject object = parser.parse(json).getAsJsonObject();
 
         for(Map.Entry<String, JsonElement> entry : object.entrySet()) {
-            users.put(entry.getKey(), new User(entry.getValue().toString()));
+            users.put(entry.getKey(), new User(entry.getKey(), entry.getValue().toString()));
         }
     }
 
@@ -42,10 +42,27 @@ public class Users {
 
         for(User u : users.values()) {
             int uCount = u.countDataSnapshot();
-            if(uCount < i)
+            if(uCount <= i)
                 i-= uCount;
             else
                 return u.getDataSnapshot(i);
+        }
+
+        return null;
+    }
+
+
+
+    public String getAddressAt(int i) {
+        if(i<0 || i >= countDataSnapshot())
+            return null;
+
+        for(User u : users.values()) {
+            int uCount = u.countDataSnapshot();
+            if(uCount < i)
+                i-= uCount;
+            else
+                return u.getAddressAt(i);
         }
 
         return null;

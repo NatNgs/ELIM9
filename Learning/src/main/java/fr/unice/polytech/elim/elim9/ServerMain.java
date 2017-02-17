@@ -2,8 +2,10 @@ package fr.unice.polytech.elim.elim9;
 
 import fr.unice.polytech.elim.elim9.firebasearchi.Device;
 import fr.unice.polytech.elim.elim9.firebasearchi.Users;
+import quickml.data.PredictionMap;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,7 +21,7 @@ public class ServerMain {
     private Users users;
 
     public ServerMain() {
-        while(true) {
+        //while(true) {
             users = new Users(rfc.getFromFire());
 
             // Learning...
@@ -30,8 +32,7 @@ public class ServerMain {
 
             // Predicting...
             predictingPhase();
-
-        }
+        //}
     }
 
 
@@ -39,11 +40,12 @@ public class ServerMain {
     private void learningPhase() {
         Device.select(Device.VIEW_ONLY_FEED);
 
-        for(int i=0; i<users.countDataSnapshot(); i+=1+ratioTestAndLearningSet) {
+        for(int i=0; i<users.countDataSnapshot(); i++/*=1+ratioTestAndLearningSet*/) {
             Map<String, Serializable> snapshot = users.getDataSnapshot(i);
 
             Serializable feedClass = snapshot.get("feedClass").toString();
             snapshot.remove("feedClass");
+            System.out.println("Feeded as "+feedClass+": "+snapshot.toString());
             rf.feedSet(feedClass, snapshot);
         }
 
@@ -72,7 +74,7 @@ public class ServerMain {
         }
 
         System.out.println("Testing phase: "+goods+" correct, "+bads+" incorrect"
-                    +(goods+bads!=0?"("+(goods/(goods+bads))+")":""));
+                    +(goods+bads!=0?"("+(100*goods/(goods+bads))+"%)":""));
     }
 
 
@@ -82,12 +84,15 @@ public class ServerMain {
         for(int i=0; i<users.countDataSnapshot(); i++) {
             Map<String, Serializable> snapshot = users.getDataSnapshot(i);
 
-            Serializable feedClass = snapshot.get("feedClass").toString();
             snapshot.remove("feedClass");
-            Serializable prediction = rf.trySet(snapshot);
+            PredictionMap prediction = rf.predictSet(snapshot);
+
+            Map<Serializable, Serializable> value = new HashMap<>(prediction);
+            value.put("appPct", 0.42);
+            value.put("ramPct", 0.42);
 
             // TODO
-            rfc.postToFire(prediction.toString());
+            rfc.postToFire(users.getAddressAt(i), prediction.toString());
         }
 
         rf.learn();
