@@ -10,7 +10,7 @@
     <string name="prediction_label">Prediction: </string>
     <string name="prediction_good_label">Good </string>
     <string name="prediction_bad_label"> Bad</string>
-    <string name="waiting_for_more_monitored_data">Waiting for more monitored Data...</string>
+    <string name="waiting_for_more_monitored_data">*Waiting for more monitored Data...</string>
     <string name="my_id_label">My id:</string>
     <string name="disconnected_status">[disconnected]</string>
 

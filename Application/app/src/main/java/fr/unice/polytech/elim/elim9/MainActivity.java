@@ -12,13 +12,22 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+
+    //You use in average "applicationNumber" ram, it's more than "applicationPCT" of our others users
+    private String ramAverage;
+    private String ramPCT;
+
+    private String BatterygoodORbad;
+
+    //You have "applicationNumber" applications installed, it's more than "applicationPCT" of our others users
+    private String applicationNumber;
+    private String applicationPCT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             ((TextView) findViewById(R.id.main_id_value)).setText(R.string.disconnected_status);
         }
+        listenResult();
     }
 
     private void onActivationSwitchStateChanged(boolean b) {
@@ -79,17 +89,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public Map<String, String> getResult(){
-        Map<String, String> res = new HashMap<>();
+    public void listenResult(){
 
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         DatabaseReference dbRef = database.getReference().child("results").child(id).child(Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID));
+        dbRef.setValue("Yolo");
+
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue()!= null) {
+                    dataSnapshot.child("applicationNumber").getValue();
+                    dataSnapshot.child("applicationPCT").getValue();
+                    dataSnapshot.child("batteryState").getValue();
+                    dataSnapshot.child("ramAverage").getValue();
+                    dataSnapshot.child("ramPCT").getValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
-
-
-        return res;
     }
 }
