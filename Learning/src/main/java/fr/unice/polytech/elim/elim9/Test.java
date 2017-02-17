@@ -1,3 +1,5 @@
+package fr.unice.polytech.elim.elim9;
+
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -18,7 +20,7 @@ public class Test {
         /*baseRoot.authAnonymously(new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
-                Test.this.onAuthenticated();
+                fr.unice.polytech.elim.elim9.Test.this.onAuthenticated();
                 synchronized (baseRoot) {
                     baseRoot.notify();
                 }

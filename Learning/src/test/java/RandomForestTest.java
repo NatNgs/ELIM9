@@ -1,3 +1,4 @@
+import fr.unice.polytech.elim.elim9.RandomForest;
 import org.junit.Test;
 
 import java.io.Serializable;

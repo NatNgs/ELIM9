@@ -1,18 +1,28 @@
-public class RestFireClient
+package fr.unice.polytech.elim.elim9;
 
-	private const string URL = "https://elim9-76267.firebaseio.com/";
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+public class RestFireClient {
+
+	private final String url = "https://elim9-76267.firebaseio.com/";
 		
-	private string userID = "-1";
+	private String userID = "-1";
 	
 	public RestFireClient(){
 
 	}
 
-	public String getFromFire(){
+	public Map<String, String> getFromFire() {
 
 		try {
-
-			URL url = new URL(URL + "users.json");
+			URL url = new URL(this.url + "users.json");
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", "application/json");
@@ -25,36 +35,31 @@ public class RestFireClient
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 				(conn.getInputStream())));
 
-			String output, temp;
-			while ((output = br.readLine()) != null); {
+			String output="", temp;
+			while ((temp = br.readLine()) != null) {
 				output += temp;
 			}
 
 			conn.disconnect();
 
-			return stringToMap(output);
-		} catch (MalformedURLException e) {
-
-			e.printStackTrace();
-
+			return jsonToMap(output);
 		} catch (IOException e) {
-
 			e.printStackTrace();
-
 		}
+		return null;
 	}
 
-	public Map<> stringToMap(String in){
-		Map<> out = new HashMap<>();
+	public Map<String, String> jsonToMap(String in){
+		Map<String,String>
+
+
 
 		return out;
 	}
 
 	public String postToFire(String post){
-
 		try {
-
-			URL url = new URL(URL + "results.json");
+			URL url = new URL(this.url + "results.json");
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestMethod("POST");
@@ -73,22 +78,17 @@ public class RestFireClient
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					(conn.getInputStream())));
 
-			String output, temp;
-			while ((output = br.readLine()) != null); {
+			String output="", temp;
+			while ((temp = br.readLine()) != null) {
 				output += temp;
 			}
 
 			conn.disconnect();
 			return output;
 
-		} catch (MalformedURLException e) {
-
-			e.printStackTrace();
-
 		} catch (IOException e) {
-
 			e.printStackTrace();
-
 		}
+		return null;
 	}
 }

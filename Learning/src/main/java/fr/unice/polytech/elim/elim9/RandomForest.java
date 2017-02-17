@@ -1,3 +1,5 @@
+package fr.unice.polytech.elim.elim9;
+
 import quickml.data.AttributesMap;
 import quickml.data.PredictionMap;
 import quickml.data.instances.ClassifierInstance;
