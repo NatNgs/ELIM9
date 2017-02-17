@@ -1,0 +1,365 @@
+{
+  "results" : {
+    "uGr95vl4XVWrOLdx7cJM26WDBXo1" : {
+      "51f998ef7085197f" : {
+        "Yolo" : "test"
+      }
+    }
+  },
+  "users" : {
+    "uGr95vl4XVWrOLdx7cJM26WDBXo1" : {
+      "44321d357983f408" : {
+        "buildId" : "NYC",
+        "dates" : {
+          "2017-02-17_03-27-54" : {
+            "dischargeActive" : 16313,
+            "lastBatteryValue" : "65/100",
+            "ramUsage" : 375135744
+          },
+          "2017-02-17_03-28-08" : {
+            "dischargeActive" : 16320,
+            "lastBatteryValue" : "65/100",
+            "ramUsage" : 375051878
+          },
+          "2017-02-17_03-29-08" : {
+            "dischargeActive" : 41577,
+            "lastBatteryValue" : "65/100",
+            "ramUsage" : 375276202
+          },
+          "2017-02-17_03-29-17" : {
+            "dischargeActive" : 41577,
+            "lastBatteryValue" : "65/100",
+            "ramUsage" : 375384851
+          },
+          "2017-02-17_03-30-32" : {
+            "dischargeActive" : 41577,
+            "lastBatteryValue" : "65/100",
+            "ramUsage" : 375630701
+          },
+          "2017-02-17_03-35-25" : {
+            "chargeActive" : 1456,
+            "lastBatteryValue" : "71/100",
+            "ramUsage" : 376651776
+          },
+          "2017-02-17_03-36-33" : {
+            "chargeActive" : 4809,
+            "lastBatteryValue" : "66/100",
+            "ramUsage" : 374221824
+          },
+          "2017-02-17_03-37-33" : {
+            "chargeActive" : 4809,
+            "lastBatteryValue" : "66/100",
+            "ramUsage" : 373253734
+          },
+          "2017-02-17_03-37-52" : {
+            "chargeActive" : 4809,
+            "lastBatteryValue" : "66/100",
+            "ramUsage" : 372727125
+          },
+          "2017-02-17_03-38-52" : {
+            "chargeActive" : 22108,
+            "lastBatteryValue" : "66/100",
+            "ramUsage" : 372476781
+          },
+          "2017-02-17_03-53-45" : {
+            "chargeActive" : 22108,
+            "lastBatteryValue" : "66/100",
+            "ramUsage" : 372294656
+          }
+        },
+        "othersAppNb" : 8,
+        "systemAppNb" : 89
+      },
+      "51f998ef7085197f" : {
+        "buildId" : "NYC",
+        "dates" : {
+          "2017-02-17_03-04-40" : {
+            "chargeActive" : 1742,
+            "lastBatteryValue" : "80/100",
+            "ramUsage" : 370419712
+          }
+        },
+        "othersAppNb" : 8,
+        "systemAppNb" : 89
+      },
+      "8d25ea995fbbb13d" : {
+        "buildId" : "NRD90M",
+        "dates" : {
+          "2017-02-16_21-38-11" : {
+            "dischargeActive" : -833106
+          },
+          "2017-02-16_21-49-03" : {
+            "dischargeActive" : -847202
+          },
+          "2017-02-16_21-49-05" : {
+            "dischargeActive" : -847202
+          },
+          "2017-02-16_21-58-46" : {
+            "chargeInactive" : 642426,
+            "dischargeActive" : -847202
+          },
+          "2017-02-16_22-21-38" : {
+            "chargeInactive" : 606160,
+            "dischargeActive" : -847202
+          },
+          "2017-02-16_22-21-39" : {
+            "chargeInactive" : 606160,
+            "dischargeActive" : -849087
+          },
+          "2017-02-16_22-21-47" : {
+            "chargeInactive" : 606160,
+            "dischargeActive" : -869179
+          },
+          "2017-02-16_23-38-00" : {
+            "lastBatteryValue" : "37/100",
+            "ramUsage" : 1405488332
+          },
+          "2017-02-16_23-38-14" : {
+            "lastBatteryValue" : "37/100",
+            "ramUsage" : 1407973052
+          },
+          "2017-02-16_23-38-15" : {
+            "lastBatteryValue" : "37/100",
+            "ramUsage" : 1411729408
+          },
+          "2017-02-16_23-38-58" : {
+            "lastBatteryValue" : "37/100",
+            "ramUsage" : 1414985825
+          },
+          "2017-02-17_01-45-10" : {
+            "chargeActive" : 2676193,
+            "lastBatteryValue" : "38/100",
+            "ramUsage" : 1440913271
+          },
+          "2017-02-17_01-46-12" : {
+            "chargeActive" : 2676193,
+            "lastBatteryValue" : "38/100",
+            "ramUsage" : 1439262521
+          },
+          "2017-02-17_02-07-24" : {
+            "chargeActive" : 2877694,
+            "lastBatteryValue" : "42/100",
+            "ramUsage" : 1438973952
+          },
+          "2017-02-17_02-07-29" : {
+            "chargeActive" : 2877694,
+            "lastBatteryValue" : "42/100",
+            "ramUsage" : 1440379500
+          },
+          "2017-02-17_02-36-26" : {
+            "chargeActive" : 3076276,
+            "lastBatteryValue" : "47/100",
+            "ramUsage" : 1439507034
+          },
+          "2017-02-17_02-36-36" : {
+            "chargeActive" : 3076276,
+            "lastBatteryValue" : "47/100",
+            "ramUsage" : 1439181911
+          },
+          "2017-02-17_02-38-07" : {
+            "chargeActive" : 3076276,
+            "lastBatteryValue" : "48/100",
+            "ramUsage" : 1438694538
+          },
+          "2017-02-17_02-38-09" : {
+            "chargeActive" : 3076276,
+            "lastBatteryValue" : "48/100",
+            "ramUsage" : 1438620618
+          },
+          "2017-02-17_04-53-32" : {
+            "chargeInactive" : 583056,
+            "lastBatteryValue" : "52/100",
+            "ramUsage" : 1465856455
+          },
+          "2017-02-17_04-53-33" : {
+            "chargeInactive" : 583056,
+            "lastBatteryValue" : "52/100",
+            "ramUsage" : 1466340930
+          },
+          "2017-02-17_04-53-39" : {
+            "chargeInactive" : 583056,
+            "lastBatteryValue" : "52/100",
+            "ramUsage" : 1467034794
+          },
+          "2017-02-17_04-53-52" : {
+            "chargeInactive" : 583056,
+            "lastBatteryValue" : "52/100",
+            "ramUsage" : 1467541712
+          },
+          "2017-02-17_04-53-55" : {
+            "chargeInactive" : 583770,
+            "lastBatteryValue" : "52/100",
+            "ramUsage" : 1467922759
+          },
+          "2017-02-17_06-31-40" : {
+            "chargeInactive" : 52518800,
+            "lastBatteryValue" : "63/100",
+            "ramUsage" : 1435131904
+          },
+          "2017-02-17_06-31-41" : {
+            "chargeInactive" : 52518800,
+            "lastBatteryValue" : "63/100",
+            "ramUsage" : 1423005013
+          },
+          "2017-02-17_06-31-43" : {
+            "chargeInactive" : 52518800,
+            "lastBatteryValue" : "63/100",
+            "ramUsage" : 1422338048
+          },
+          "2017-02-17_06-32-00" : {
+            "chargeInactive" : 52518800,
+            "lastBatteryValue" : "63/100",
+            "ramUsage" : 1421688832
+          }
+        },
+        "othersAppNb" : 131,
+        "systemAppNb" : 133
+      },
+      "SHIELD Tablet" : {
+        "dates" : {
+          "2017-02-16_09-47-15" : {
+            "chargeActive" : 11394,
+            "chargeInactive" : 8645,
+            "dischargeActive" : 12365,
+            "dischargeInactive" : 76785,
+            "ramUsage" : 2243243
+          },
+          "2017-02-16_10-47-13" : {
+            "chargeActive" : 11765,
+            "chargeInactive" : 8810,
+            "dischargeActive" : 12365,
+            "dischargeInactive" : 79672,
+            "ramUsage" : 2243243
+          },
+          "2017-02-16_11-45-02" : {
+            "chargeActive" : 11865000,
+            "chargeInactive" : 8630000,
+            "dischargeActive" : 12365000,
+            "dischargeInactive" : 74563000,
+            "ramUsage" : 1438973952
+          },
+          "2017-02-16_18-47-45" : {
+            "chargeActive" : 12024,
+            "chargeInactive" : 8364,
+            "dischargeActive" : 13012,
+            "dischargeInactive" : 73098,
+            "ramUsage" : 2243243
+          },
+          "2017-02-16_21-47-165" : {
+            "chargeActive" : 11352,
+            "chargeInactive" : 8963,
+            "dischargeActive" : 11236,
+            "dischargeInactive" : 77563,
+            "ramUsage" : 2243243
+          }
+        },
+        "othersAppNb" : 76,
+        "systemAppNb" : 197
+      },
+      "ea31be777861181d" : {
+        "buildId" : "LMY48X",
+        "dates" : {
+          "2017-02-16_21-04-42" : {
+            "dischargeActive" : -19195,
+            "ramUsage" : 754675712
+          },
+          "2017-02-16_21-04-58" : {
+            "dischargeActive" : -19203,
+            "ramUsage" : 756373504
+          },
+          "2017-02-16_21-05-00" : {
+            "dischargeActive" : -22446,
+            "ramUsage" : 756899840
+          },
+          "2017-02-16_21-05-13" : {
+            "dischargeActive" : -22446,
+            "ramUsage" : 758860185
+          },
+          "2017-02-16_21-05-34" : {
+            "dischargeActive" : -22446,
+            "ramUsage" : 758774442
+          },
+          "2017-02-16_21-05-57" : {
+            "dischargeActive" : -22456,
+            "ramUsage" : 758944914
+          },
+          "2017-02-16_21-07-49" : {
+            "dischargeActive" : -22456,
+            "ramUsage" : 758944914
+          },
+          "2017-02-16_21-08-20" : {
+            "dischargeActive" : -22456,
+            "ramUsage" : 758944914
+          },
+          "2017-02-16_21-09-02" : {
+            "dischargeActive" : 9142,
+            "ramUsage" : 758944914
+          },
+          "2017-02-16_21-15-40" : {
+            "dischargeActive" : -22468,
+            "ramUsage" : 758944914
+          },
+          "2017-02-16_21-15-48" : {
+            "dischargeActive" : -5139,
+            "ramUsage" : 761160192
+          },
+          "2017-02-16_21-18-00" : {
+            "ramUsage" : 758944914
+          },
+          "2017-02-16_21-18-52" : {
+            "ramUsage" : 761339904
+          },
+          "2017-02-16_21-18-56" : {
+            "chargeActive" : 9748,
+            "ramUsage" : 763068416
+          }
+        },
+        "othersAppNb" : 8,
+        "systemAppNb" : 69
+      }
+    },
+    "x7cJM26WDBXo1dKJuGr95vl4XVWrO" : {
+      "SHIELD Tablet" : {
+        "dates" : {
+          "2017-02-10_11-27-12" : {
+            "chargeActive" : 12765,
+            "chargeInactive" : 7930,
+            "dischargeActive" : 11365,
+            "dischargeInactive" : 78375,
+            "ramUsage" : 2243243
+          },
+          "2017-02-10_11-40-12" : {
+            "chargeActive" : 12765,
+            "chargeInactive" : 7930,
+            "dischargeActive" : 11365,
+            "dischargeInactive" : 78375,
+            "ramUsage" : 2243243
+          },
+          "2017-02-10_11-47-12" : {
+            "chargeActive" : 10324,
+            "chargeInactive" : 7930,
+            "dischargeActive" : 11365,
+            "dischargeInactive" : 78375,
+            "ramUsage" : 2243243
+          },
+          "2017-02-11_11-47-12" : {
+            "chargeActive" : 10765,
+            "chargeInactive" : 7136,
+            "dischargeActive" : 11365,
+            "dischargeInactive" : 78375,
+            "ramUsage" : 2243243
+          },
+          "2017-02-12_11-47-12" : {
+            "chargeActive" : 12765,
+            "chargeInactive" : 7930,
+            "dischargeActive" : 11365,
+            "dischargeInactive" : 78375,
+            "ramUsage" : 2243243
+          }
+        },
+        "othersAppNb" : 35,
+        "systemAppNb" : 234
+      }
+    }
+  }
+}
