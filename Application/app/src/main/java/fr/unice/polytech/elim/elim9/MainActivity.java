@@ -26,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private String ramAverage;
     private String ramPCT;
 
-    private String batterygoodORbad;
+    private double good;
+    private double bad;
 
     //You have "applicationNumber" applications installed, it's more than "applicationPCT" of our others users
     private String applicationNumber;
@@ -76,9 +77,11 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param value Between 0 and 1 included, else progress will be indeterminate
      */
-    public void changeProgressBarValue(double value) {
+    public void changeProgressBarValue(double good, double bad) {
         ProgressBar progressBar = (ProgressBar)findViewById(R.id.main_prediction_progress);
         final int PRECISION = progressBar.getWidth();
+
+        double value = good * (1-bad);
 
         if(value < 0 || value > 1 || PRECISION == 0) {
             progressBar.setIndeterminate(true);
@@ -113,22 +116,23 @@ public class MainActivity extends AppCompatActivity {
 
                         Log.d("applicationNumber", obj.getString("applicationNumber"));
                         Log.d("applicationPCT", obj.getString("applicationPCT"));
-                        Log.d("batteryState", obj.getString("batteryState"));
                         Log.d("ramAverage", obj.getString("ramAverage"));
                         Log.d("ramPCT", obj.getString("ramPCT"));
 
 
-                       applicationNumber = obj.getString("applicationNumber");
-                       applicationPCT = obj.getString("applicationPCT");
-                       batterygoodORbad = obj.getString("batteryState");
-                       ramAverage = obj.getString("ramAverage");
-                       ramPCT = obj.getString("ramPCT");
+                        applicationNumber = obj.getString("applicationNumber");
+                        applicationPCT = obj.getString("applicationPCT");
+                        ramAverage = obj.getString("ramAverage");
+                        ramPCT = obj.getString("ramPCT");
+                        good = obj.getDouble("good");
+                        bad = obj.getDouble("bad");
 
-                       ((TextView)  findViewById(R.id.AppsPCT)).setText(applicationPCT);
-                       ((TextView)  findViewById(R.id.RamPCT)).setText(ramPCT);
-                       ((TextView)  findViewById(R.id.RamAverage)).setText(ramAverage);
-                       ((TextView)  findViewById(R.id.Apps)).setText(applicationNumber);
-                        changeProgressBarValue(batterygoodORbad.equals("Good")?1:0);
+                        ((TextView)  findViewById(R.id.AppsPCT)).setText(applicationPCT);
+                        ((TextView)  findViewById(R.id.RamPCT)).setText(ramPCT);
+                        ((TextView)  findViewById(R.id.RamAverage)).setText(ramAverage);
+                        ((TextView)  findViewById(R.id.Apps)).setText(applicationNumber);
+
+                        changeProgressBarValue(good, bad);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
