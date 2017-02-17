@@ -1,17 +1,28 @@
 package fr.unice.polytech.elim.elim9;
 
 import android.util.Log;
-import android.widget.SectionIndexer;
 
-import com.google.gson.Gson;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.*;
-import java.util.*;
-
-import static fr.unice.polytech.elim.elim9.DataElement.DataKind.*;
+import static fr.unice.polytech.elim.elim9.DataElement.DataKind.chActPct;
+import static fr.unice.polytech.elim.elim9.DataElement.DataKind.chActTime;
+import static fr.unice.polytech.elim.elim9.DataElement.DataKind.chInactPct;
+import static fr.unice.polytech.elim.elim9.DataElement.DataKind.chInactTime;
+import static fr.unice.polytech.elim.elim9.DataElement.DataKind.dischActPct;
+import static fr.unice.polytech.elim.elim9.DataElement.DataKind.dischActTime;
+import static fr.unice.polytech.elim.elim9.DataElement.DataKind.dischInactPct;
+import static fr.unice.polytech.elim.elim9.DataElement.DataKind.dischInactTime;
+import static fr.unice.polytech.elim.elim9.DataElement.DataKind.ramUsage;
 
 /**
  * Created by nathael on 16/02/17.
@@ -210,7 +221,7 @@ public class DataElement {
             if (!f.exists() || f.delete())
                 f.createNewFile();
 
-            String json = toSaveStr(instance.dataArrays);
+            String json = toSaveStr(getInstance().dataArrays);
             FileOutputStream fos = new FileOutputStream(f);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(json);
@@ -232,8 +243,8 @@ public class DataElement {
 
             Map<DataKind, List<PairDateValue>> map = fromSaveStr(json);
             if (map != null) {
-                instance.dataArrays.clear();
-                instance.dataArrays.putAll(map);
+                getInstance().dataArrays.clear();
+                getInstance().dataArrays.putAll(map);
             }
 
             ois.close();

@@ -23,24 +23,25 @@ public class ServerMain {
     private Users users;
 
     public ServerMain() {
-        while(true) {
-            users = new Users(rfc.getFromFire());
+		rf.unfeedSet();
+		users = new Users(rfc.getFromFire());
 
-            // Learning...
-            learningPhase();
+		// Learning...
+		learningPhase();
 
-            // Testing...
-            testingPhase();
-
-            // Predicting...
-            predictingPhase();
-            
-            try {
-				Thread.sleep(5000);
+		// Testing...
+		testingPhase();
+			
+		while(true) {
+			// Predicting...
+			predictingPhase();
+			
+			try {
+				Thread.sleep(20000);
 			} catch(InterruptedException ignored) {
 				break;
 			}
-        }
+		}
     }
 
 

@@ -34,12 +34,8 @@ public class RandomForest {
         dataset.add(new ClassifierInstance(map, setClass));
     }
 
-    public void unfeedSet(Map<String,Serializable> set) {
-        new HashSet<>(dataset)
-                .stream()
-                .filter(classifierInstance
-                        -> classifierInstance.getAttributes().entrySet().equals(set.entrySet()))
-                .forEach(dataset::remove);
+    public void unfeedSet() {
+        dataset.clear();
     }
 
     public PredictionMap predictSet(Map<String,Serializable> set) {
