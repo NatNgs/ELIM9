@@ -109,8 +109,6 @@ public class ServerMain {
                 rfc.postToFire2(users.getAddressAt(i)+"/"+key, value.get(key));
             }
         }
-
-        rf.learn();
     }
 
     public static void main(String[] args) {
