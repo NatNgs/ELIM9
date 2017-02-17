@@ -6,4 +6,8 @@ import java.util.Map;
 /**
  * Created by nathael on 17/02/17.
  */
-public class User extends HashMap<String, Device> {}
+public class User extends HashMap<String, Device> {
+
+
+
+}
