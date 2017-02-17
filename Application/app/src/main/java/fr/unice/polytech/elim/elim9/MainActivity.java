@@ -1,6 +1,8 @@
 package fr.unice.polytech.elim.elim9;
 
+import android.app.ActivityManager;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -12,13 +14,16 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.*;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -75,16 +80,19 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      *
-     * @param value Between 0 and 1 included, else progress will be indeterminate
+     * @param good Between 0 and 1 included, else progress will be indeterminate
+     * @param bad Between 0 and 1 included, else progress will be indeterminate
      */
-    public void changeProgressBarValue(double good, double bad) {
+    public void changeProgressBarValue(final double good, final double bad) {
         ProgressBar progressBar = (ProgressBar)findViewById(R.id.main_prediction_progress);
+        TextView textValue = (TextView)findViewById(R.id.main_prediction_value);
         final int PRECISION = progressBar.getWidth();
 
-        double value = good * (1-bad);
+        final double value = (good==bad)?50:good / (good + bad);
 
         if(value < 0 || value > 1 || PRECISION == 0) {
             progressBar.setIndeterminate(true);
+            textValue.setText("Waiting for more monitored Data...");
 
             if(PRECISION==0) {
                 Log.e("MainActivity", "Progressbar width = 0 !!");
@@ -92,7 +100,8 @@ public class MainActivity extends AppCompatActivity {
         } else {
             progressBar.setIndeterminate(false);
             progressBar.setMax(PRECISION);
-            progressBar.setProgress((int) ((value) * PRECISION)); // because progressbar is inverted
+            progressBar.setProgress((int) (value * PRECISION)); // because progressbar is inverted
+            textValue.setText("Good chance: "+((int)(good*1000)/10.)+"%, Bad chance: "+(int)(bad*1000)/10.+"%; Total chance: "+((int)(value*10000)/100.)+"% good");
         }
     }
 
@@ -114,21 +123,22 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         obj = new JSONObject(dataSnapshot.getValue().toString());
 
-                        Log.d("applicationNumber", obj.getString("applicationNumber"));
-                        Log.d("applicationPCT", obj.getString("applicationPCT"));
-                        Log.d("ramAverage", obj.getString("ramAverage"));
-                        Log.d("ramPCT", obj.getString("ramPCT"));
+                        List<ApplicationInfo> appList = getApplicationContext().getPackageManager().getInstalledApplications(0);
+                        applicationNumber = ""+appList.size();
 
+                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
 
-                        applicationNumber = obj.getString("applicationNumber");
-                        applicationPCT = obj.getString("applicationPCT");
-                        ramAverage = obj.getString("ramAverage");
-                        ramPCT = obj.getString("ramPCT");
+                        ActivityManager activityManager = (ActivityManager) getApplicationContext().getSystemService(ACTIVITY_SERVICE);
+                        activityManager.getMemoryInfo(mi);
+                        ramAverage = "" + (mi.totalMem - mi.availMem);
+
+                        ramPCT = ""+(int)(obj.getDouble("ramPct")*10000)/100.;
+                        applicationPCT = ""+(int)(obj.getDouble("appPct")*10000)/100.;
                         good = obj.getDouble("good");
                         bad = obj.getDouble("bad");
 
-                        ((TextView)  findViewById(R.id.AppsPCT)).setText(applicationPCT);
-                        ((TextView)  findViewById(R.id.RamPCT)).setText(ramPCT);
+                        ((TextView)  findViewById(R.id.AppsPCT)).setText(applicationPCT+"%");
+                        ((TextView)  findViewById(R.id.RamPCT)).setText(ramPCT+"%");
                         ((TextView)  findViewById(R.id.RamAverage)).setText(ramAverage);
                         ((TextView)  findViewById(R.id.Apps)).setText(applicationNumber);
 

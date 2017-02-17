@@ -110,7 +110,7 @@ public class RestFireClient {
 					.body("{\""+address+"\":"+post+"}")
 					.asJson();
 
-			System.out.println("Response = "+jsonResponse.getStatus()+":"+jsonResponse.getStatusText()+"\n"+jsonResponse.getBody());
+			System.out.println("Response = "+jsonResponse.getStatus()+":"+jsonResponse.getStatusText()+" : "+jsonResponse.getBody());
 		} catch (UnirestException e) {
 			e.printStackTrace();
 		}
