@@ -1,18 +1,97 @@
 package fr.unice.polytech.elim.elim9;
 
+import fr.unice.polytech.elim.elim9.firebasearchi.Device;
+import fr.unice.polytech.elim.elim9.firebasearchi.Users;
+
+import java.io.Serializable;
+import java.util.Map;
+
 /**
  * Created by nathael on 17/02/17.
  */
 public class ServerMain {
+    /** 4 = there will be 4 datasnaphot used as test for 1 datasnapshot used as learning (80% tests, 20% learning)
+     * 1 = there will be 1 datasnaphot used as test for 1 datasnapshot used as learning (50% tests, 50% learning)
+     */
+    private static final int ratioTestAndLearningSet = 2;
     private final RandomForest rf = new RandomForest();
     private final RestFireClient rfc = new RestFireClient();
+    private Users users;
 
     public ServerMain() {
         while(true) {
+            users = new Users(rfc.getFromFire());
+
+            // Learning...
+            learningPhase();
+
+            // Testing...
+            testingPhase();
+
+            // Predicting...
+            predictingPhase();
 
         }
     }
 
+
+
+    private void learningPhase() {
+        Device.select(Device.VIEW_ONLY_FEED);
+
+        for(int i=0; i<users.countDataSnapshot(); i+=1+ratioTestAndLearningSet) {
+            Map<String, Serializable> snapshot = users.getDataSnapshot(i);
+
+            Serializable feedClass = snapshot.get("feedClass").toString();
+            snapshot.remove("feedClass");
+            rf.feedSet(feedClass, snapshot);
+        }
+
+        rf.learn();
+    }
+
+    private void testingPhase() {
+        Device.select(Device.VIEW_ONLY_FEED);
+
+        int goods = 0, bads = 0;
+        for(int i=1; i<users.countDataSnapshot(); i++) {
+            if(i%(1+ratioTestAndLearningSet) == 0)
+                continue;
+
+            Map<String, Serializable> snapshot = users.getDataSnapshot(i);
+
+            Serializable feedClass = snapshot.get("feedClass").toString();
+            snapshot.remove("feedClass");
+            Serializable prediction = rf.trySet(snapshot);
+
+            if(feedClass.equals(prediction)) {
+                goods ++;
+            } else {
+                bads++;
+            }
+        }
+
+        System.out.println("Testing phase: "+goods+" correct, "+bads+" incorrect"
+                    +(goods+bads!=0?"("+(goods/(goods+bads))+")":""));
+    }
+
+
+    private void predictingPhase() {
+        Device.select(Device.VIEW_ALL);
+
+        for(int i=0; i<users.countDataSnapshot(); i++) {
+            Map<String, Serializable> snapshot = users.getDataSnapshot(i);
+
+            Serializable feedClass = snapshot.get("feedClass").toString();
+            snapshot.remove("feedClass");
+            Serializable prediction = rf.trySet(snapshot);
+
+            // TODO
+            rfc.postToFire(prediction.toString());
+        }
+
+        rf.learn();
+    }
 
     public static void main(String[] args) {
         new ServerMain();

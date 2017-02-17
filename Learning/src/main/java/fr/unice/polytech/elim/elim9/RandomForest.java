@@ -28,7 +28,7 @@ public class RandomForest {
                 .buildPredictiveModel(dataset);
     }
 
-    public void feedSet(String setClass, Map<String,Serializable> set) {
+    public void feedSet(Serializable setClass, Map<String,Serializable> set) {
         AttributesMap map = new AttributesMap();
         map.putAll(set);
         dataset.add(new ClassifierInstance(map, setClass));

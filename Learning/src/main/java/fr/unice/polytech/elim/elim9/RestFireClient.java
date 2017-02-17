@@ -6,20 +6,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 public class RestFireClient {
 
 	private final String url = "https://elim9-76267.firebaseio.com/";
 		
 	private String userID = "-1";
-	
-	public RestFireClient(){
 
-	}
 
-	public Map<String, String> getFromFire() {
+	public String getFromFire() {
 
 		try {
 			URL url = new URL(this.url + "users.json");
@@ -35,26 +30,19 @@ public class RestFireClient {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 				(conn.getInputStream())));
 
-			String output="", temp;
+			StringBuilder output= new StringBuilder();
+			String temp;
 			while ((temp = br.readLine()) != null) {
-				output += temp;
+				output.append(temp);
 			}
 
 			conn.disconnect();
 
-			return jsonToMap(output);
+			return output.toString();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	public Map<String, String> jsonToMap(String in){
-		Map<String,String>
-
-
-
-		return out;
 	}
 
 	public String postToFire(String post){
