@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
             progressBar.setIndeterminate(false);
             progressBar.setMax(PRECISION);
             progressBar.setProgress((int) (value * PRECISION)); // because progressbar is inverted
-            textValue.setText("Good chance: "+((int)(good*1000)/10.)+"%, Bad chance: "+(int)(bad*1000)/10.+"%; Total chance: "+((int)(value*10000)/100.)+"% good");
+            textValue.setText("Good chance: "+((int)(good*1000)/10.)+"%, Bad chance: "+(int)(bad*1000)/10.+"%");
         }
     }
 

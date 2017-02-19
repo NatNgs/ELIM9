@@ -25,6 +25,7 @@ public class RandomForest {
         randomForest = new RandomDecisionForestBuilder<>(new DecisionTreeBuilder<>()
                 // The default isn't desirable here because this dataset has so few attributes
                 .attributeIgnoringStrategy(new IgnoreAttributesWithConstantProbability(0.2)))
+                .numTrees(16)
                 .buildPredictiveModel(dataset);
     }
 
