@@ -10,7 +10,6 @@ import android.content.pm.ApplicationInfo;
 import android.os.AsyncTask;
 import android.os.BatteryManager;
 import android.os.Build;
-import android.os.Debug;
 import android.provider.Settings;
 import android.util.Log;
 

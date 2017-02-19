@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("fr.unice.polytech.elim.elim9", appContext.getPackageName());
+        assertEquals("fr.unice.polytech.elim.healthydroid", appContext.getPackageName());
     }
 }

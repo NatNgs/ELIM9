@@ -15,22 +15,22 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity">
+        <activity android:name="fr.unice.polytech.elim.elim9.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name="fr.unice.polytech.elim.elim9.MainActivity" />
 
         <service
-            android:name=".MonitoringService"
+            android:name="fr.unice.polytech.elim.elim9.MonitoringService"
             android:enabled="true"
             android:exported="true" />
 
         <receiver
-            android:name=".BatteryStateReceiver"
+            android:name="fr.unice.polytech.elim.elim9.BatteryStateReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

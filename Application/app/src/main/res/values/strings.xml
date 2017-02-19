@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ELIM9</string>
+    <string name="app_name">Healthydroid</string>
     <string name="login">Login</string>
     <string name="open_without_connecting">Open without connecting</string>
     <string name="hint_mail">Mail address</string>

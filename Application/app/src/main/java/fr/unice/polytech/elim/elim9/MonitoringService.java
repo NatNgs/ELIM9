@@ -11,7 +11,7 @@ import android.util.Log;
 import java.util.Calendar;
 
 public class MonitoringService extends Service {
-    private static final String DATA_ELEMENT_FILENAME = "elim9.save";
+    private static final String DATA_ELEMENT_FILENAME = "healthydroid.save";
     private BatteryStateReceiver receiver;
 
     public MonitoringService() {
